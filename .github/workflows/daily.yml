@@ -1,0 +1,40 @@
+name: Daily Instagram snapshot
+
+on:
+  schedule:
+    - cron: "17 12 * * *"   # 7:17 AM Indianapolis in winter, 8:17 AM in summer
+  workflow_dispatch:         # lets you run it any time from the Actions tab
+
+permissions:
+  contents: write
+
+concurrency:
+  group: follower-tracker
+  cancel-in-progress: false
+
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Take snapshot
+        env:
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          IG_USER_ID: "17841401665501406"
+          NOTION_ACCOUNTS_DB: "7f8bee63d83a4e3087d27d6b5a7a0067"
+          NOTION_SNAPSHOTS_DB: "ec89d5102a6943f59cd3e69fb76bb143"
+        run: python tracker.py
+
+      - name: Save data for the widget
+        if: always()
+        run: |
+          git config user.name "follower-tracker"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data docs/data.json 2>/dev/null || true
+          git diff --cached --quiet || (git commit -m "Snapshot $(date -u +%F)" && git push)

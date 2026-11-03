@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Follower Cards</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
+<style>
+  :root {
+    --page: #F2F2F4;
+    --card: #FFFFFF;
+    --ink: #0A0A0B;
+    --muted: #6E6E73;
+    --up: #188A32;
+    --down: #C4122F;
+    --ring: rgba(0, 0, 0, 0.06);
+    --shadow: 0 1px 2px rgba(0,0,0,.04), 0 8px 24px rgba(0,0,0,.06);
+    --avatar-bg: #E5E5EA;
+  }
+  :root[data-theme="dark"] {
+    --page: #000000;
+    --card: #1C1C1E;
+    --ink: #FFFFFF;
+    --muted: #A1A1A6;
+    --up: #30D158;
+    --down: #FF6961;
+    --ring: rgba(255, 255, 255, 0.08);
+    --shadow: none;
+    --avatar-bg: #3A3A3C;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    background: var(--page);
+    color: var(--ink);
+    font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    padding: 16px;
+  }
+  body.bare { background: transparent; }
+
+  .grid {
+    display: grid;
+    gap: 16px;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  .grid .large { grid-column: 1 / -1; }
+
+  .card {
+    background: var(--card);
+    border-radius: 28px;
+    box-shadow: var(--shadow), 0 0 0 1px var(--ring);
+    padding: 28px 30px 26px;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+  .count {
+    font-weight: 700;
+    letter-spacing: -0.035em;
+    line-height: 0.95;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  .label { font-size: 22px; font-weight: 400; margin-top: 6px; }
+
+  .person { display: flex; align-items: center; gap: 14px; min-width: 0; }
+  .avatar {
+    width: 52px; height: 52px; border-radius: 50%; flex-shrink: 0;
+    background: var(--avatar-bg); object-fit: cover;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 18px; color: var(--muted);
+  }
+  .who { display: flex; flex-direction: column; min-width: 0; }
+  .handle { font-weight: 700; font-size: 20px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .name { color: var(--muted); font-size: 18px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+  .delta { font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .delta.up { color: var(--up); }
+  .delta.down { color: var(--down); }
+  .delta.flat { color: var(--muted); }
+  .window { color: var(--muted); font-size: 18px; white-space: nowrap; }
+
+  /* large card */
+  .large .count { font-size: clamp(64px, 14vw, 120px); }
+  .large .bottom { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-top: 26px; }
+  .large .change { display: flex; flex-direction: column; align-items: flex-end; flex-shrink: 0; }
+  .large .delta { font-size: 24px; }
+
+  /* small card */
+  .small .count { font-size: clamp(44px, 9vw, 58px); }
+  .small .meta { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-top: 4px; }
+  .small .meta .label { margin-top: 0; }
+  .small .delta { font-size: 20px; }
+  .small .person { margin-top: 34px; }
+  .small .avatar { width: 44px; height: 44px; font-size: 15px; }
+  .small .handle { font-size: 18px; }
+  .small .name { font-size: 16px; }
+
+  @media (max-width: 480px) {
+    body { padding: 10px; }
+    .card { padding: 22px 22px 20px; border-radius: 24px; }
+    .large .bottom { flex-direction: column; align-items: flex-start; }
+    .large .change { align-items: flex-start; }
+  }
+
+  .notice {
+    max-width: 520px; margin: 40px auto; text-align: center;
+    color: var(--muted); font-size: 16px; line-height: 1.5;
+  }
+</style>
+</head>
+<body>
+<main id="root" aria-live="polite"></main>
+
+<script>
+(function () {
+  var params = new URLSearchParams(location.search);
+  var theme = params.get("theme") || "auto";
+  var root = document.documentElement;
+  function applyTheme() {
+    var dark = theme === "dark" ||
+      (theme === "auto" && window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches);
+    root.setAttribute("data-theme", dark ? "dark" : "light");
+  }
+  applyTheme();
+  if (theme === "auto" && window.matchMedia) {
+    matchMedia("(prefers-color-scheme: dark)").addEventListener("change", applyTheme);
+  }
+  if (params.get("bg") === "none") document.body.classList.add("bare");
+
+  var wanted = (params.get("handle") || "").toLowerCase().split(",").map(function (s) {
+    return s.trim().replace(/^@/, "");
+  }).filter(Boolean);
+  var size = params.get("size"); // "large" | "small" | null
+  var mount = document.getElementById("root");
+
+  function el(tag, cls, text) {
+    var n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (text != null) n.textContent = text;
+    return n;
+  }
+  function fmt(n) { return Number(n).toLocaleString("en-US"); }
+  function signed(n) { return (n > 0 ? "+" : n < 0 ? "−" : "") + fmt(Math.abs(n)); }
+  function shortDate(iso) {
+    var d = new Date(iso + "T12:00:00");
+    return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+  }
+
+  function change(acct) {
+    if (acct.change7 != null) return { value: acct.change7, label: "within a week" };
+    if (acct.history && acct.history.length > 1) {
+      return { value: acct.changeSinceStart, label: "since " + shortDate(acct.trackingSince) };
+    }
+    return { value: null, label: "tracking started" };
+  }
+
+  function avatar(acct) {
+    var initials = (acct.name || acct.handle || "?").split(/\s+/).map(function (w) { return w[0]; })
+      .join("").slice(0, 2).toUpperCase();
+    var fallback = el("div", "avatar", initials);
+    fallback.setAttribute("aria-hidden", "true");
+    if (!acct.picture) return fallback;
+    var img = el("img", "avatar");
+    img.alt = "";
+    img.referrerPolicy = "no-referrer";
+    img.src = acct.picture;
+    img.onerror = function () { img.replaceWith(fallback); };
+    return img;
+  }
+
+  function person(acct) {
+    var p = el("div", "person");
+    p.appendChild(avatar(acct));
+    var who = el("div", "who");
+    who.appendChild(el("div", "handle", acct.handle));
+    if (acct.name) who.appendChild(el("div", "name", acct.name));
+    p.appendChild(who);
+    return p;
+  }
+
+  function deltaNode(c) {
+    if (c.value == null) return null;
+    var cls = c.value > 0 ? "up" : c.value < 0 ? "down" : "flat";
+    return el("div", "delta " + cls, signed(c.value));
+  }
+
+  function largeCard(acct) {
+    var card = el("article", "card large");
+    card.setAttribute("aria-label", acct.handle + ", " + fmt(acct.followers) + " followers");
+    card.appendChild(el("div", "count", fmt(acct.followers)));
+    card.appendChild(el("div", "label", "followers"));
+    var bottom = el("div", "bottom");
+    bottom.appendChild(person(acct));
+    var c = change(acct);
+    var side = el("div", "change");
+    var d = deltaNode(c);
+    if (d) side.appendChild(d);
+    side.appendChild(el("div", "window", c.label));
+    bottom.appendChild(side);
+    card.appendChild(bottom);
+    return card;
+  }
+
+  function smallCard(acct) {
+    var card = el("article", "card small");
+    card.setAttribute("aria-label", acct.handle + ", " + fmt(acct.followers) + " followers");
+    card.appendChild(el("div", "count", fmt(acct.followers)));
+    var meta = el("div", "meta");
+    meta.appendChild(el("div", "label", "followers"));
+    var d = deltaNode(change(acct));
+    if (d) meta.appendChild(d);
+    card.appendChild(meta);
+    card.appendChild(person(acct));
+    return card;
+  }
+
+  function notice(text) {
+    mount.innerHTML = "";
+    mount.appendChild(el("p", "notice", text));
+  }
+
+  function render(data) {
+    var accounts = data.accounts || [];
+    if (wanted.length) {
+      accounts = wanted.map(function (h) {
+        return accounts.find(function (a) { return a.handle.toLowerCase() === h; });
+      }).filter(Boolean);
+      if (!accounts.length) {
+        notice("No data for @" + wanted.join(", @") + " yet. Check that the handle is in IG Accounts and marked Active. It appears after the next daily update.");
+        return;
+      }
+    }
+    if (!accounts.length) {
+      notice("No accounts yet. They'll appear after the first daily update.");
+      return;
+    }
+    var grid = el("div", "grid");
+    accounts.forEach(function (acct, i) {
+      var big = size === "large" || (size !== "small" && (wanted.length === 1 || (!wanted.length && i === 0 && params.get("feature") === "first")));
+      grid.appendChild(big ? largeCard(acct) : smallCard(acct));
+    });
+    mount.innerHTML = "";
+    mount.appendChild(grid);
+  }
+
+  fetch("data.json?t=" + Date.now(), { cache: "no-store" })
+    .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+    .then(render)
+    .catch(function () { notice("No data yet. The first update runs on the next morning's schedule, or when you run it by hand from GitHub Actions."); });
+})();
+</script>
+</body>
+</html>
