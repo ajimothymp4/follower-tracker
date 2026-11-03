@@ -84,6 +84,15 @@
   .delta.flat { color: var(--muted); }
   .window { color: var(--muted); font-size: 18px; white-space: nowrap; }
 
+  /* growth chart */
+  .chart { margin-top: 24px; }
+  .chart svg { display: block; width: 100%; height: 132px; overflow: visible; }
+  .chart .axis { position: relative; height: 18px; margin-top: 10px; color: var(--muted); font-size: 13px; font-variant-numeric: tabular-nums; }
+  .chart .axis span { position: absolute; top: 0; white-space: nowrap; transform: translateX(-50%); }
+  .chart .axis span:first-child { transform: none; }
+  .chart .axis span:last-child { transform: translateX(-100%); }
+  .chart .pending { color: var(--muted); font-size: 15px; }
+
   /* large card */
   .large .count { font-size: clamp(64px, 14vw, 120px); }
   .large .bottom { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-top: 26px; }
@@ -189,11 +198,70 @@
     return el("div", "delta " + cls, signed(c.value));
   }
 
+  var SVGNS = "http://www.w3.org/2000/svg";
+  function svgEl(tag, attrs) {
+    var n = document.createElementNS(SVGNS, tag);
+    for (var k in attrs) n.setAttribute(k, attrs[k]);
+    return n;
+  }
+
+  // Daily follower line: one point per day from the snapshot history.
+  function chart(acct) {
+    var pts = (acct.history || []).slice(-(Number(params.get("days")) || 30));
+    var wrap = el("div", "chart");
+    if (pts.length < 2) {
+      wrap.appendChild(el("div", "pending", "Growth chart starts after the second daily update."));
+      return wrap;
+    }
+    var W = 600, H = 132, padT = 10, padB = 10;
+    var vals = pts.map(function (p) { return p.followers; });
+    var lo = Math.min.apply(null, vals), hi = Math.max.apply(null, vals);
+    if (hi === lo) { hi += 1; lo -= 1; }
+    var pad = (hi - lo) * 0.12; lo -= pad; hi += pad;
+    function x(i) { return (i / (pts.length - 1)) * W; }
+    function y(v) { return padT + (1 - (v - lo) / (hi - lo)) * (H - padT - padB); }
+    var trend = vals[vals.length - 1] - vals[0];
+    var color = trend > 0 ? "var(--up)" : trend < 0 ? "var(--down)" : "var(--muted)";
+
+    var svg = svgEl("svg", { viewBox: "0 0 " + W + " " + H, preserveAspectRatio: "none", role: "img",
+      "aria-label": "Daily followers from " + fmt(vals[0]) + " to " + fmt(vals[vals.length - 1]) + " over " + pts.length + " days" });
+    var line = pts.map(function (p, i) { return (i ? "L" : "M") + x(i).toFixed(1) + " " + y(p.followers).toFixed(1); }).join(" ");
+    svg.appendChild(svgEl("path", { d: line + " L" + W + " " + H + " L0 " + H + " Z", fill: color, opacity: "0.12" }));
+    svg.appendChild(svgEl("path", { d: line, fill: "none", stroke: color, "stroke-width": "3",
+      "stroke-linejoin": "round", "stroke-linecap": "round", "vector-effect": "non-scaling-stroke" }));
+    wrap.appendChild(svg);
+
+    // Daily dots drawn as HTML so they stay round when the chart stretches.
+    var dots = el("div");
+    dots.style.cssText = "position:relative;height:0";
+    pts.forEach(function (p, i) {
+      if (pts.length > 14 && i !== pts.length - 1) return;
+      var d = el("span");
+      d.title = shortDate(p.date) + ": " + fmt(p.followers);
+      d.style.cssText = "position:absolute;width:9px;height:9px;border-radius:50%;background:" + color +
+        ";left:calc(" + (x(i) / W * 100) + "% - 4.5px);top:" + (y(p.followers) - H - 4.5) + "px";
+      dots.appendChild(d);
+    });
+    wrap.appendChild(dots);
+
+    var axis = el("div", "axis");
+    var labelIdx = pts.length <= 7 ? pts.map(function (_, i) { return i; })
+      : [0, Math.floor((pts.length - 1) / 2), pts.length - 1];
+    labelIdx.forEach(function (i) {
+      var s = el("span", null, shortDate(pts[i].date));
+      s.style.left = (x(i) / W * 100) + "%";
+      axis.appendChild(s);
+    });
+    wrap.appendChild(axis);
+    return wrap;
+  }
+
   function largeCard(acct) {
     var card = el("article", "card large");
     card.setAttribute("aria-label", acct.handle + ", " + fmt(acct.followers) + " followers");
     card.appendChild(el("div", "count", fmt(acct.followers)));
     card.appendChild(el("div", "label", "followers"));
+    if (params.get("chart") !== "0") card.appendChild(chart(acct));
     var bottom = el("div", "bottom");
     bottom.appendChild(person(acct));
     var c = change(acct);
