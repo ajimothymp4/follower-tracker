@@ -3,6 +3,7 @@ name: Daily Instagram snapshot
 on:
   schedule:
     - cron: "17 12 * * *"   # 7:17 AM Indianapolis in winter, 8:17 AM in summer
+    - cron: "47 17 * * *"   # backup run at 12:47 PM in case GitHub skips the morning one (same-day rerun just refreshes today's numbers)
   workflow_dispatch:         # lets you run it any time from the Actions tab
 
 permissions:
