@@ -216,7 +216,9 @@
     var W = 600, H = 132, padT = 10, padB = 10;
     var vals = pts.map(function (p) { return p.followers; });
     var lo = Math.min.apply(null, vals), hi = Math.max.apply(null, vals);
-    if (hi === lo) { hi += 1; lo -= 1; }
+    // Keep tiny changes (like +1 on 9,700) from looking like huge jumps.
+    var minSpan = Math.max(10, hi * 0.02);
+    if (hi - lo < minSpan) { var mid = (hi + lo) / 2; lo = mid - minSpan / 2; hi = mid + minSpan / 2; }
     var pad = (hi - lo) * 0.12; lo -= pad; hi += pad;
     function x(i) { return (i / (pts.length - 1)) * W; }
     function y(v) { return padT + (1 - (v - lo) / (hi - lo)) * (H - padT - padB); }
