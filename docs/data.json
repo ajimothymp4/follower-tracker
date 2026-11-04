@@ -1,21 +1,25 @@
 {
- "updated": "2026-11-03T17:30-05:00",
+ "updated": "2026-11-04T09:26-05:00",
  "accounts": [
   {
    "handle": "isaacrossvideo",
    "label": "Isaac Ross",
    "name": "Isaac Ross || Christ-Centered Wedding Videographer",
-   "picture": "https://scontent-ord5-1.xx.fbcdn.net/v/t51.82787-15/750035591_18101858108610641_2295913902423295988_n.jpg?_nc_cat=108&ccb=1-7&_nc_sid=7d201b&_nc_ohc=No-uYvkAzP0Q7kNvwFsQ5mn&_nc_oc=AdrmT17N0wyYAgqWE7wfMHAAJ7c5uZ6cvCpq3PrOS69L6Em9qucK6YwKEc4LZoPeuVo&_nc_zt=23&_nc_ht=scontent-ord5-1.xx&edm=AL-3X8kEAAAA&_nc_gid=jIJ_StuWinebNhEgPHCOAg&oh=00_AQT8whskKFsnlBHeprt3b-0jO6sTOVVZuukx40qG0iGrxQ&oe=6AF035E2",
-   "followers": 2792,
+   "picture": "https://scontent-sjc6-1.xx.fbcdn.net/v/t51.82787-15/750035591_18101858108610641_2295913902423295988_n.jpg?_nc_cat=108&ccb=1-7&_nc_sid=7d201b&_nc_ohc=No-uYvkAzP0Q7kNvwFYH5tr&_nc_oc=Ado47dpZWmc6_oiwmxWcAU6Pse3ey7--dWh4mEugcGn8o2uQ7VfYE0RN7z6uiCXmcJQ&_nc_zt=23&_nc_ht=scontent-sjc6-1.xx&edm=AL-3X8kEAAAA&_nc_gid=kII8K1p4CBAZsEGBZNGxmA&oh=00_AQQg4MbSNQ-lqE8Yf6F9mtFfUbEOlNI4mXPidd1GkhzqXw&oe=6AF116E2",
+   "followers": 2793,
    "posts": 168,
    "change7": null,
    "change30": null,
-   "changeSinceStart": 0,
+   "changeSinceStart": 1,
    "trackingSince": "2026-11-03",
    "history": [
     {
      "date": "2026-11-03",
      "followers": 2792
+    },
+    {
+     "date": "2026-11-04",
+     "followers": 2793
     }
    ]
   },
@@ -23,17 +27,21 @@
    "handle": "khoffx",
    "label": "Kyle Hoffman",
    "name": "Kyle Hoffman",
-   "picture": "https://scontent-ord5-1.xx.fbcdn.net/v/t51.82787-15/704586599_18582915796058986_8095580027631546692_n.jpg?_nc_cat=106&ccb=1-7&_nc_sid=7d201b&_nc_ohc=2OWyOXqRYfgQ7kNvwGtlIPo&_nc_oc=AdrEpR3e2OtPU9S8XPQI3GQOywh523uyWCkh5h2mcDBHG-nylCAZG_9E7BDgK-rsJC4&_nc_zt=23&_nc_ht=scontent-ord5-1.xx&edm=AL-3X8kEAAAA&_nc_gid=ydsxrUAeBpQhfg0ROr-SxQ&oh=00_AQR9q1kAtwvAUNSqcUfZPJWg8jVjhTBExPGtJGavgp53pQ&oe=6AF0466D",
-   "followers": 1028,
+   "picture": "https://scontent-sjc3-1.xx.fbcdn.net/v/t51.82787-15/704586599_18582915796058986_8095580027631546692_n.jpg?_nc_cat=106&ccb=1-7&_nc_sid=7d201b&_nc_ohc=2OWyOXqRYfgQ7kNvwHyXBZC&_nc_oc=Adpg901cMoiTbBVTidz3I2EoP2SSl3MYuepmXlfr8pHzIn2a8I-yxeNFbgpOGIv_9V8&_nc_zt=23&_nc_ht=scontent-sjc3-1.xx&edm=AL-3X8kEAAAA&_nc_gid=INzPGsGgfCRaUlzY77KMWA&oh=00_AQQN2x84pyDNCUXSYuMZQeWhnmZ_t7z-GV_dbvbuhpavQg&oe=6AF1276D",
+   "followers": 1060,
    "posts": 228,
    "change7": null,
    "change30": null,
-   "changeSinceStart": 0,
+   "changeSinceStart": 32,
    "trackingSince": "2026-11-03",
    "history": [
     {
      "date": "2026-11-03",
      "followers": 1028
+    },
+    {
+     "date": "2026-11-04",
+     "followers": 1060
     }
    ]
   },
@@ -41,7 +49,7 @@
    "handle": "maxxmoorre",
    "label": "Max Moore",
    "name": "Max Moore",
-   "picture": "https://scontent-ord5-1.xx.fbcdn.net/v/t51.82787-15/716150166_18595841131060219_6418001997545021045_n.jpg?_nc_cat=111&ccb=1-7&_nc_sid=7d201b&_nc_ohc=Nhph8LZeta8Q7kNvwGcvjJt&_nc_oc=AdqOg_dES_5612dURb-RzZ5qn8tIv0me2MoFkX-u6PUrp6G2YNK1tN4JwNOXWpbnqV0&_nc_zt=23&_nc_ht=scontent-ord5-1.xx&edm=AL-3X8kEAAAA&_nc_gid=uPzEOZN8vXmhY0DTxO2vxQ&oh=00_AQQhNnXs38-scD_QH47kugbp3PEKeecssI0mYIVcMFdLIw&oe=6AF03404",
+   "picture": "https://scontent-sjc6-1.xx.fbcdn.net/v/t51.82787-15/716150166_18595841131060219_6418001997545021045_n.jpg?_nc_cat=111&ccb=1-7&_nc_sid=7d201b&_nc_ohc=qipIroUsu1MQ7kNvwHdU3Jv&_nc_oc=AdqniZnAgiqiAdz2av0N2vD6wi3eSWidS1nGfOPksgNBvs_cGnqJvSVznekY9yzg7lA&_nc_zt=23&_nc_ht=scontent-sjc6-1.xx&edm=AL-3X8kEAAAA&_nc_gid=jwqSl_toJmIW3YwZ2Q8-RQ&oh=00_AQSATzGr4Se9jROTtK33SEVRM3oewcFhlH8DX75YhL5bXA&oe=6AF11504",
    "followers": 3230,
    "posts": 543,
    "change7": null,
@@ -52,6 +60,10 @@
     {
      "date": "2026-11-03",
      "followers": 3230
+    },
+    {
+     "date": "2026-11-04",
+     "followers": 3230
     }
    ]
   },
@@ -59,17 +71,21 @@
    "handle": "trace.mp4",
    "label": "Trace Burgess",
    "name": "Trace Burgess",
-   "picture": "https://scontent-ord5-2.xx.fbcdn.net/v/t51.82787-15/645927413_18022738859644780_3261312347163752032_n.jpg?_nc_cat=100&ccb=1-7&_nc_sid=7d201b&_nc_ohc=5YRR6c44UKYQ7kNvwE7QKqj&_nc_oc=AdpZ3p1sdRo-hSG7lQZOTucXE8rDYfpff_TdlqzI7AujMyLSIaLIyHr4TTU4Tq91iPo&_nc_zt=23&_nc_ht=scontent-ord5-2.xx&edm=AL-3X8kEAAAA&_nc_gid=_Pa7SvV5cSDzlXDrH3YCrw&oh=00_AQQ59X-84cxLpCBvRRUFoEwnBPuTJUae8GO97p4UbeQDug&oe=6AF03590",
-   "followers": 1959,
+   "picture": "https://scontent-sjc6-1.xx.fbcdn.net/v/t51.82787-15/645927413_18022738859644780_3261312347163752032_n.jpg?_nc_cat=100&ccb=1-7&_nc_sid=7d201b&_nc_ohc=5YRR6c44UKYQ7kNvwE__K3w&_nc_oc=AdrJdohKXP3vOEbGp3DzcwD_q27VTM5edfrMsynfAJ_YlDw1us__3678-eG9pWu7XBM&_nc_zt=23&_nc_ht=scontent-sjc6-1.xx&edm=AL-3X8kEAAAA&_nc_gid=eJivoSCZkTgpwvwHh0tu5Q&oh=00_AQS5gD8SnOE2Nm6ep5GuaLo_BEwydkWMyu7OIpSAcY14LA&oe=6AF11690",
+   "followers": 1960,
    "posts": 57,
    "change7": null,
    "change30": null,
-   "changeSinceStart": 0,
+   "changeSinceStart": 1,
    "trackingSince": "2026-11-03",
    "history": [
     {
      "date": "2026-11-03",
      "followers": 1959
+    },
+    {
+     "date": "2026-11-04",
+     "followers": 1960
     }
    ]
   },
@@ -77,17 +93,21 @@
    "handle": "indystreetsweep",
    "label": "Indy Street Sweep",
    "name": "Indy Street Sweep \ud83e\uddf9",
-   "picture": "https://scontent-ord5-1.xx.fbcdn.net/v/t51.82787-15/640427123_17850433434686228_8913889909761827125_n.jpg?_nc_cat=101&ccb=1-7&_nc_sid=7d201b&_nc_ohc=8MXoOZHoCXEQ7kNvwGMRORp&_nc_oc=AdpzR-8uaW6NQl67-rzWaRJ1YwAkBfWB27i8lETaM0DeTniLWhOFqv7sAvJa5rbeIXI&_nc_zt=23&_nc_ht=scontent-ord5-1.xx&edm=AL-3X8kEAAAA&_nc_gid=4PmqN5k_Pk4wIrNjdALm0g&oh=00_AQSkOtY-ZPwG-t5Nbc13khELNHXZV6v3uY4BPpZu-brjNA&oe=6AF0408D",
-   "followers": 1009,
+   "picture": "https://scontent-sjc6-1.xx.fbcdn.net/v/t51.82787-15/640427123_17850433434686228_8913889909761827125_n.jpg?_nc_cat=101&ccb=1-7&_nc_sid=7d201b&_nc_ohc=8MXoOZHoCXEQ7kNvwFLNrtw&_nc_oc=AdqvkhBLGSdHj__9pbDmYyj5U5cGrKmuHgX24Sz3jJzcfKyObGuUxlYctMbNyScUYtE&_nc_zt=23&_nc_ht=scontent-sjc6-1.xx&edm=AL-3X8kEAAAA&_nc_gid=jE1DOL6l4bpPfN8awQvW9A&oh=00_AQRMTKuMg2pcu3G5TzQ9lvvNC_FT7CGCBSos3va-R-KIEA&oe=6AF1218D",
+   "followers": 1010,
    "posts": 26,
    "change7": null,
    "change30": null,
-   "changeSinceStart": 0,
+   "changeSinceStart": 1,
    "trackingSince": "2026-11-03",
    "history": [
     {
      "date": "2026-11-03",
      "followers": 1009
+    },
+    {
+     "date": "2026-11-04",
+     "followers": 1010
     }
    ]
   },
@@ -95,17 +115,21 @@
    "handle": "roots.realty.co",
    "label": "Roots Realty Co.",
    "name": "Roots Realty Co.",
-   "picture": "https://scontent-ord5-1.xx.fbcdn.net/v/t51.82787-15/609080971_17968602524996190_4677994714950357704_n.jpg?_nc_cat=109&ccb=1-7&_nc_sid=7d201b&_nc_ohc=cJlv95M4MQkQ7kNvwEAYVbr&_nc_oc=Adp9HVT-7hmr99TcfI_TYEHQktZNRp0EAuOUWn-u0hhqjCf-7yZaCD14IABVwZeqNrE&_nc_zt=23&_nc_ht=scontent-ord5-1.xx&edm=AL-3X8kEAAAA&_nc_gid=sadpmxdiTcSiyjCRYoaapA&oh=00_AQSWiF7qIcJz5F_dQawGxjBn046Q-LZ8DOHHzQInnMPADA&oe=6AF02DCC",
-   "followers": 4770,
+   "picture": "https://scontent-sjc6-1.xx.fbcdn.net/v/t51.82787-15/609080971_17968602524996190_4677994714950357704_n.jpg?_nc_cat=109&ccb=1-7&_nc_sid=7d201b&_nc_ohc=cJlv95M4MQkQ7kNvwHZby1c&_nc_oc=AdpghBD8PeiF_rAm-JNAJsimFhd9HBMm_Umir8cL6hElxrxfeGFMASW3bX3UifqqN2k&_nc_zt=23&_nc_ht=scontent-sjc6-1.xx&edm=AL-3X8kEAAAA&_nc_gid=gCgbDtVOIeSW5pC3EKX0Cw&oh=00_AQTAMl21FR7_6OhSGkUp3jQ2P7bZUxHaSCLwtFEBy17daw&oe=6AF10ECC",
+   "followers": 4773,
    "posts": 871,
    "change7": null,
    "change30": null,
-   "changeSinceStart": 0,
+   "changeSinceStart": 3,
    "trackingSince": "2026-11-03",
    "history": [
     {
      "date": "2026-11-03",
      "followers": 4770
+    },
+    {
+     "date": "2026-11-04",
+     "followers": 4773
     }
    ]
   },
@@ -113,17 +137,21 @@
    "handle": "firsthomeindy",
    "label": "Ian DeFelice (First Home Indy)",
    "name": "Ian DeFelice | Indy\u2019s First-Time Buyer Guide",
-   "picture": "https://scontent-ord5-2.xx.fbcdn.net/v/t51.82787-15/697110202_18176447377363262_1235865768064687157_n.jpg?_nc_cat=110&ccb=1-7&_nc_sid=7d201b&_nc_ohc=4CHC-vfsBBAQ7kNvwFVO0r5&_nc_oc=AdrbaG37DPepZ95WPPTCMDPCTJTf5y4Zg4huNloQqG80pqJGY6KPP2A60o8rAhRKP4Y&_nc_zt=23&_nc_ht=scontent-ord5-2.xx&edm=AL-3X8kEAAAA&_nc_gid=uOrvxmbWDBwQ0PN0UL35uQ&oh=00_AQTfjBJwrshQg2jwLCu67Xp8qWtbqdLuSPZ9npOI3jBRqA&oe=6AF01D6D",
-   "followers": 102,
+   "picture": "https://scontent-sjc3-1.xx.fbcdn.net/v/t51.82787-15/697110202_18176447377363262_1235865768064687157_n.jpg?_nc_cat=110&ccb=1-7&_nc_sid=7d201b&_nc_ohc=4CHC-vfsBBAQ7kNvwGLgpXM&_nc_oc=AdpWsCs4roMF32SKXcq42CLjB5i3c3dBesHWnecQWNfEcfp0pUgtn7p5byD4QgdhUiY&_nc_zt=23&_nc_ht=scontent-sjc3-1.xx&edm=AL-3X8kEAAAA&_nc_gid=R4h90mcWgJ2jk5dlnRFoKA&oh=00_AQS4SvfdSdcSbvGc_SQy6QHPBLix_Ox5CInf4KQMazI3lA&oe=6AF0FE6D",
+   "followers": 103,
    "posts": 21,
    "change7": null,
    "change30": null,
-   "changeSinceStart": 0,
+   "changeSinceStart": 1,
    "trackingSince": "2026-11-03",
    "history": [
     {
      "date": "2026-11-03",
      "followers": 102
+    },
+    {
+     "date": "2026-11-04",
+     "followers": 103
     }
    ]
   },
@@ -131,17 +159,21 @@
    "handle": "tyler_lingle",
    "label": "Tyler Lingle",
    "name": "Tyler Lingle",
-   "picture": "https://scontent-ord5-1.xx.fbcdn.net/v/t51.82787-15/744601497_18603951466009672_1830812531598291573_n.jpg?_nc_cat=111&ccb=1-7&_nc_sid=7d201b&_nc_ohc=pCRBfTDTH40Q7kNvwFCmYMj&_nc_oc=AdpEEyO7ZBJS-RST0d92G7tKgyt5FnMP5my7PAbs8Jrx22Fj0tEf9Tz6u7r5Lvu75qM&_nc_zt=23&_nc_ht=scontent-ord5-1.xx&edm=AL-3X8kEAAAA&_nc_gid=BmcMjTVlESnaKA5H2EVjxQ&oh=00_AQT2yGFIeYgucM4sCLr7-dSIzRDNjnCPGa0heC5v-8i8gw&oe=6AF01A06",
-   "followers": 9700,
+   "picture": "https://scontent-sjc6-1.xx.fbcdn.net/v/t51.82787-15/744601497_18603951466009672_1830812531598291573_n.jpg?_nc_cat=111&ccb=1-7&_nc_sid=7d201b&_nc_ohc=pCRBfTDTH40Q7kNvwGCX1tp&_nc_oc=Adq13XCu4oOygvcB6Up8WVzd57jXQBThixq--w-2KFbzFJRMLQ4iQaCrrz6HWdcYtsk&_nc_zt=23&_nc_ht=scontent-sjc6-1.xx&edm=AL-3X8kEAAAA&_nc_gid=ajPsjcs35vjkYmaiyZ7ssw&oh=00_AQSUjsQOnDjmc5CT28Ep9hWbBah6v8TDVZXi--UQBPMpUQ&oe=6AF0FB06",
+   "followers": 9701,
    "posts": 1067,
    "change7": null,
    "change30": null,
-   "changeSinceStart": 0,
+   "changeSinceStart": 1,
    "trackingSince": "2026-11-03",
    "history": [
     {
      "date": "2026-11-03",
      "followers": 9700
+    },
+    {
+     "date": "2026-11-04",
+     "followers": 9701
     }
    ]
   },
@@ -149,17 +181,21 @@
    "handle": "iandefelice",
    "label": "Ian DeFelice",
    "name": "Ian DeFelice | REALTOR",
-   "picture": "https://scontent-ord5-1.xx.fbcdn.net/v/t51.82787-15/877891143_18637354390007174_6334838336283127436_n.jpg?_nc_cat=111&ccb=1-7&_nc_sid=7d201b&_nc_ohc=_8v-ICc-K0YQ7kNvwGv0w6F&_nc_oc=AdqjzK_ZkOVTkC3PCSX__Mx8pDmgZkpMXwKpFuNrbKcLXbXTk2WUpQZGXsg8eCKKdU8&_nc_zt=23&_nc_ht=scontent-ord5-1.xx&edm=AL-3X8kEAAAA&_nc_gid=QOc-DJxIO5kY9eAoTZkIwQ&oh=00_AQRGHIQVhmqMORx4p6fi26PHGMExjOC28HciSGdIP4hEmg&oe=6AF03D4C",
-   "followers": 3517,
+   "picture": "https://scontent-sjc6-1.xx.fbcdn.net/v/t51.82787-15/877891143_18637354390007174_6334838336283127436_n.jpg?_nc_cat=111&ccb=1-7&_nc_sid=7d201b&_nc_ohc=_8v-ICc-K0YQ7kNvwEDHpuD&_nc_oc=AdpJw2RgEqtWnctaQZ2Xbu5ccYcMOMgQdRzsP7LA--8H11FmQSjFBOCBu9b7vNNCh7o&_nc_zt=23&_nc_ht=scontent-sjc6-1.xx&edm=AL-3X8kEAAAA&_nc_gid=FqHdDmDdMYk16l9awHxdWQ&oh=00_AQROY3ueGwPI32F1mdwYQQvF78NrrhtpmZxHkrvY-5U2bQ&oe=6AF11E4C",
+   "followers": 3520,
    "posts": 644,
    "change7": null,
    "change30": null,
-   "changeSinceStart": 0,
+   "changeSinceStart": 3,
    "trackingSince": "2026-11-03",
    "history": [
     {
      "date": "2026-11-03",
      "followers": 3517
+    },
+    {
+     "date": "2026-11-04",
+     "followers": 3520
     }
    ]
   },
@@ -167,7 +203,7 @@
    "handle": "househackindy",
    "label": "Kyle Hoffman (House Hack Indy)",
    "name": "Kyle Hoffman | House Hack Specialist",
-   "picture": "https://scontent-ord5-2.xx.fbcdn.net/v/t51.82787-15/702404172_18064967042405965_6701716502373711345_n.jpg?_nc_cat=107&ccb=1-7&_nc_sid=7d201b&_nc_ohc=qEbz6DbmQhAQ7kNvwEFQLEh&_nc_oc=AdrK0AupxakfqmZvzNlmiSOObMnQdqhF3R4vBIClBPBLNpew2j_rZGnZbe80WbhWnSs&_nc_zt=23&_nc_ht=scontent-ord5-2.xx&edm=AL-3X8kEAAAA&_nc_gid=SNq82B94cZUZ9Ntj0h_0VA&oh=00_AQS3IuoPJTQbwVQkKGXCQhMi_91JfRTjgzWpbkeH4TLsgw&oe=6AF01744",
+   "picture": "https://scontent-sjc6-1.xx.fbcdn.net/v/t51.82787-15/702404172_18064967042405965_6701716502373711345_n.jpg?_nc_cat=107&ccb=1-7&_nc_sid=7d201b&_nc_ohc=qEbz6DbmQhAQ7kNvwEO0EFr&_nc_oc=AdpUlT1w37WWnsCXU28hFO2cdiP-wFn_PbSsRB3-xJeErVmJymbq-9aP6xjewcDH32U&_nc_zt=23&_nc_ht=scontent-sjc6-1.xx&edm=AL-3X8kEAAAA&_nc_gid=9r0sUtKKLjuSievEvq385A&oh=00_AQTQYOl_InEJgOwC6DJMjjQWLfVIyQZ4DMJbMZ3dhMpgKw&oe=6AF0F844",
    "followers": 78,
    "posts": 19,
    "change7": null,
@@ -178,6 +214,10 @@
     {
      "date": "2026-11-03",
      "followers": 78
+    },
+    {
+     "date": "2026-11-04",
+     "followers": 78
     }
    ]
   },
@@ -185,17 +225,21 @@
    "handle": "lastergrowth",
    "label": "Jon Laster",
    "name": "Mens Growth Coach | Jon Laster",
-   "picture": "https://scontent-ord5-2.xx.fbcdn.net/v/t51.82787-15/844521647_18345296167266571_5078508670237654663_n.jpg?_nc_cat=102&ccb=1-7&_nc_sid=7d201b&_nc_ohc=NmH3M9cHcc8Q7kNvwGogzN6&_nc_oc=AdpTh2yrYvhMMNreVQpi_MAZymio6csmjwx-nhQ0rtDOZNBR4_e47kLHReEbNwgDCDM&_nc_zt=23&_nc_ht=scontent-ord5-2.xx&edm=AL-3X8kEAAAA&_nc_gid=fpLiRLv40jvEkAbTiGjvnw&oh=00_AQTg3G0oMU-sw9SDfJMPDe9FIduWE-xJ74UfQY-gMP2yuQ&oe=6AF04781",
-   "followers": 3528,
+   "picture": "https://scontent-sjc6-1.xx.fbcdn.net/v/t51.82787-15/844521647_18345296167266571_5078508670237654663_n.jpg?_nc_cat=102&ccb=1-7&_nc_sid=7d201b&_nc_ohc=NmH3M9cHcc8Q7kNvwEKed9J&_nc_oc=AdqXhhxOubVM6WBXy0iF-HAfRUe4PIRLtxb4aSVB32ihXVYE4I5G1VEKPAWPZpMGmgY&_nc_zt=23&_nc_ht=scontent-sjc6-1.xx&edm=AL-3X8kEAAAA&_nc_gid=anypDygIwsyeZYbvVYjfVg&oh=00_AQRkqth5HLGkiCpolJDfVhNwK7FeApRWfjialYgbkLMPAA&oe=6AF12881",
+   "followers": 3529,
    "posts": 408,
    "change7": null,
    "change30": null,
-   "changeSinceStart": 0,
+   "changeSinceStart": 1,
    "trackingSince": "2026-11-03",
    "history": [
     {
      "date": "2026-11-03",
      "followers": 3528
+    },
+    {
+     "date": "2026-11-04",
+     "followers": 3529
     }
    ]
   },
@@ -203,17 +247,21 @@
    "handle": "remingtontramsey",
    "label": "Remington Ramsey",
    "name": "Remington T. Ramsey",
-   "picture": "https://scontent-ord5-2.xx.fbcdn.net/v/t51.82787-15/527307907_18513727588044467_1368473265516602942_n.jpg?_nc_cat=107&ccb=1-7&_nc_sid=7d201b&_nc_ohc=Ki1dBazzEy8Q7kNvwGervsd&_nc_oc=AdqCW_2NGUCJEFJPk14mM2PI_YjYiFSdX3x6nw1U1qiRNqCOokIdFw7QR32tibMyJWg&_nc_zt=23&_nc_ht=scontent-ord5-2.xx&edm=AL-3X8kEAAAA&_nc_gid=FuhkWuNN2DLHGXJSHwyhtQ&oh=00_AQSm9dqTIrKbzbdVB2XC6gPTgUpHmQwMTUg1KSsJ0-zE_Q&oe=6AF040B0",
-   "followers": 86981,
+   "picture": "https://scontent-sjc6-1.xx.fbcdn.net/v/t51.82787-15/527307907_18513727588044467_1368473265516602942_n.jpg?_nc_cat=107&ccb=1-7&_nc_sid=7d201b&_nc_ohc=k2Y2iMNjrfcQ7kNvwEY4pik&_nc_oc=AdqZnS7TmTdTBYWrSqzdI-GOqKWanXxlnSSqmr-2CdEw9rdl_PSIaV0hYk787qxnNSk&_nc_zt=23&_nc_ht=scontent-sjc6-1.xx&edm=AL-3X8kEAAAA&_nc_gid=_k7FQml4biSXWkvFpVSfOQ&oh=00_AQTX1ZCD28MhmpoGRJ1OXty-YhxOlNIvu48y93OTNm3_2Q&oe=6AF121B0",
+   "followers": 86964,
    "posts": 735,
    "change7": null,
    "change30": null,
-   "changeSinceStart": 0,
+   "changeSinceStart": -17,
    "trackingSince": "2026-11-03",
    "history": [
     {
      "date": "2026-11-03",
      "followers": 86981
+    },
+    {
+     "date": "2026-11-04",
+     "followers": 86964
     }
    ]
   },
@@ -221,7 +269,7 @@
    "handle": "ajkallasvideo",
    "label": "AJ Kallas",
    "name": "AJ Kallas | Maximize Media",
-   "picture": "https://scontent-ord5-2.xx.fbcdn.net/v/t51.82787-15/840621642_18634236031055517_8116342985859380424_n.jpg?_nc_cat=105&ccb=1-7&_nc_sid=7d201b&_nc_ohc=wyHOLukFPnUQ7kNvwHBAljP&_nc_oc=AdqWEJUojenbcxSdNIyhzFCmPy_niZ2ai_TW3Rd4cL_ku8rR2ITYSFUZ_ZARINBFY4U&_nc_zt=23&_nc_ht=scontent-ord5-2.xx&edm=AL-3X8kEAAAA&_nc_gid=CC8FfA_SrJPFZcbGMwxuVQ&oh=00_AQTIshIOf-iR1uWMNTEHdcHpHrDtrJ8k2EJwRDkS57mbAQ&oe=6AF03ED1",
+   "picture": "https://scontent-sjc3-1.xx.fbcdn.net/v/t51.82787-15/840621642_18634236031055517_8116342985859380424_n.jpg?_nc_cat=105&ccb=1-7&_nc_sid=7d201b&_nc_ohc=wyHOLukFPnUQ7kNvwHVRaZg&_nc_oc=Adp2_YkcIOcX0rEQVY9AGWMR_fybtV8qwzwhJyoTnB090XIAg42MTg7wKdj3K7z56KE&_nc_zt=23&_nc_ht=scontent-sjc3-1.xx&edm=AL-3X8kEAAAA&_nc_gid=wHjYimV_SpM0gi2B03zlWg&oh=00_AQScLNDPIIHEgyUV672HRxkxM73snLKZFNQeOz8rzalz9A&oe=6AF11FD1",
    "followers": 613,
    "posts": 11,
    "change7": null,
@@ -231,6 +279,10 @@
    "history": [
     {
      "date": "2026-11-03",
+     "followers": 613
+    },
+    {
+     "date": "2026-11-04",
      "followers": 613
     }
    ]
