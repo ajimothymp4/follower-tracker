@@ -120,6 +120,7 @@
   .reels-title { font-weight: 700; font-size: 22px; }
   .reels-sub { color: var(--muted); font-size: 16px; }
   .reels-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-bottom: 22px; }
+  .reels-stats.four { grid-template-columns: repeat(4, minmax(0, 1fr)); }
   .reels-stats .num { font-weight: 700; font-size: 28px; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
   .reels-stats .cap { color: var(--muted); font-size: 14px; margin-top: 2px; }
   .reel-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
@@ -139,9 +140,29 @@
   .reelgrid { grid-column: 1 / -1; padding: 16px; }
   .reelgrid .pending { color: var(--muted); font-size: 15px; padding: 12px; }
 
+  /* one-row layout (layout=row) */
+  .reel-grid.row { grid-template-columns: repeat(var(--n), minmax(0, 1fr)) !important; }
+
+  /* fit-to-frame (fit=1): the card fills the embed and the reel tiles resize to fit, no scrolling */
+  html.fit, html.fit body { height: 100%; }
+  html.fit body { overflow: hidden; display: flex; flex-direction: column; }
+  html.fit #root { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+  html.fit .grid { flex: 1; min-height: 0; width: 100%; grid-template-rows: minmax(0, 1fr); }
+  html.fit .grid > .card { min-height: 0; overflow: hidden; }
+  html.fit .ov-reels { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+  .fitbox { flex: 1; min-height: 0; display: flex; justify-content: center; align-items: flex-start; }
+  .fitbox .reel-grid { justify-content: center; }
+  .reelgrid .fitbox { align-items: center; }
+  .reel-grid.no-cap .reel-cap, .reel-grid.no-meta .reel-meta { display: none; }
+  html.fit .reel-grid .thumb .views { font-size: clamp(11px, calc(var(--tw, 200px) * 0.12), 18px); left: 8px; bottom: 7px; }
+  html.fit .reel-grid .thumb .views svg { width: clamp(9px, calc(var(--tw, 200px) * 0.09), 14px); }
+  html.fit .reel-grid .thumb .badge { font-size: clamp(9px, calc(var(--tw, 200px) * 0.08), 12px); padding: 3px 7px; }
+  html.fit .reel-grid .thumb { border-radius: clamp(8px, calc(var(--tw, 200px) * 0.1), 16px); }
+
   @media (max-width: 480px) {
     .reel-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .reels-stats .num { font-size: 22px; }
+    .reels-stats.four, .ov-stats.four { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; row-gap: 16px; }
   }
 
   @media (max-width: 480px) {
@@ -233,6 +254,13 @@
   }).filter(Boolean);
   var size = params.get("size"); // "large" | "small" | null
   var mount = document.getElementById("root");
+  var rowLayout = params.get("layout") === "row";
+  var fitMode = params.get("fit") === "1";
+  // How many reels a view shows: the link's value, else 3 in a one-row layout, else the view's default.
+  function reelCount(raw, def) {
+    var n = Number(raw);
+    return n > 0 ? Math.min(n, 12) : (rowLayout ? 3 : def);
+  }
 
   function el(tag, cls, text) {
     var n = document.createElement(tag);
@@ -408,7 +436,7 @@
   }
 
   function reelsCard(acct) {
-    var reels = (acct.reels || []).slice(0, Number(params.get("count")) || 6);
+    var reels = (acct.reels || []).slice(0, reelCount(params.get("count"), 6));
     var card = el("article", "card reels");
     card.setAttribute("aria-label", "Recent reels for " + acct.handle);
 
@@ -434,10 +462,13 @@
       if (t >= monthAgo && r.views != null && (!top || r.views > top.views)) top = r;
     });
 
-    var stats = el("div", "reels-stats");
-    [[compact(avg), "avg views, last " + withViews.length],
+    var stats = el("div", "reels-stats four");
+    var avgLast = (acct.reels || []).slice(0, 6).filter(function (r) { return r.views != null; });
+    var avg6 = avgLast.length ? Math.round(avgLast.reduce(function (t, r) { return t + r.views; }, 0) / avgLast.length) : null;
+    [[compact(avg6), "avg views, last " + avgLast.length],
      [top ? compact(top.views) : "—", "top reel, 30 days"],
-     [acct.engagement != null ? (acct.engagement * 100).toFixed(1) + "%" : "—", "engagement"]]
+     [acct.engagement != null ? (acct.engagement * 100).toFixed(1) + "%" : "—", "engagement"],
+     [compact(avg30(acct)), "avg views, 30 days"]]
       .forEach(function (pair) {
         var b = el("div");
         b.appendChild(el("div", "num", pair[0]));
@@ -453,7 +484,9 @@
   // The grid of reel tiles, shared by the reels, overview (&reels=N) and reelgrid views.
   // details=false keeps only the thumbnail with its view count.
   function reelGrid(reels, top, details) {
-    var grid = el("div", "reel-grid");
+    var grid = el("div", "reel-grid" + (rowLayout ? " row" : ""));
+    grid.style.setProperty("--n", reels.length);
+    if (details === false) grid.dataset.details = "0";
     reels.forEach(function (r) {
       var a = el("a", "reel");
       a.href = r.link; a.target = "_blank"; a.rel = "noopener";
@@ -492,8 +525,7 @@
 
   // view=reelgrid: just the newest reels, no account info or stats.
   function reelGridCard(acct) {
-    var n = Number(params.get("count")) || 6;
-    var rr = recentReels(acct, n);
+    var rr = recentReels(acct, reelCount(params.get("count"), 6));
     var card = el("article", "card reelgrid");
     card.setAttribute("aria-label", "Newest reels from " + acct.handle);
     if (!rr.reels.length) {
@@ -507,6 +539,14 @@
   // ---- Shared reel numbers for the overview, stat and spotlight views ----
   function postedTime(iso) { return new Date(iso.replace(/([+-]\d\d)(\d\d)$/, "$1:$2")).getTime(); }
   function pct(f) { return (f * 100).toFixed(1) + "%"; }
+  // Average views of reels posted in the last 30 days. The nightly job computes it from up to
+  // 40 recent posts; older data files fall back to the reels the widget has.
+  function avg30(acct) {
+    if (acct.avg30 != null) return acct.avg30;
+    var since = Date.now() - 30 * 864e5;
+    var v = (acct.reels || []).filter(function (r) { return r.views != null && postedTime(r.posted) >= since; });
+    return v.length ? Math.round(v.reduce(function (t, r) { return t + r.views; }, 0) / v.length) : null;
+  }
   function reelNumbers(acct) {
     var reels = (acct.reels || []).filter(function (r) { return r.posted; }).slice()
       .sort(function (a, b) { return postedTime(b.posted) - postedTime(a.posted); });
@@ -519,9 +559,9 @@
       avg: last6.length ? Math.round(last6.reduce(function (t, r) { return t + r.views; }, 0) / last6.length) : null,
       avgCount: last6.length,
       top: top,
-      posts30: acct.reels ? recent.length : null,
-      // data.json only carries the newest few reels; if all of them are recent, the true count may be higher.
-      posts30Capped: reels.length >= 9 && recent.length === reels.length
+      posts30: acct.reels30 != null ? acct.reels30 : acct.reels ? recent.length : null,
+      // Older data files only carry the newest few reels; if all of them are recent, the true count may be higher.
+      posts30Capped: acct.reels30 == null && reels.length >= 9 && recent.length === reels.length
     };
   }
 
@@ -547,8 +587,10 @@
     if (n.avg != null) items.push([compact(n.avg), "avg views, last " + n.avgCount + (n.avgCount === 1 ? " reel" : " reels")]);
     if (n.top) items.push([compact(n.top.views), "top reel, 30 days"]);
     if (acct.engagement != null) items.push([pct(acct.engagement), "engagement"]);
+    var a30 = avg30(acct);
+    if (a30 != null) items.push([compact(a30), "avg views, 30 days"]);
     if (items.length) {
-      var stats = el("div", "ov-stats");
+      var stats = el("div", "ov-stats" + (items.length === 4 ? " four" : ""));
       stats.style.gridTemplateColumns = "repeat(" + items.length + ", minmax(0, 1fr))";
       items.forEach(function (pair) {
         var b = el("div");
@@ -560,7 +602,7 @@
     }
 
     // &reels=N adds the newest N reels under the stats.
-    var nReels = Math.min(Number(params.get("reels")) || 0, 12);
+    var nReels = reelCount(params.get("reels"), 0);
     if (nReels > 0) {
       var rr = recentReels(acct, nReels);
       if (rr.reels.length) {
@@ -591,6 +633,11 @@
       var n = reelNumbers(a);
       return n.top ? { value: compact(n.top.views), caption: "views on top reel, 30 days" }
         : { value: "—", caption: "no reels in the last 30 days" };
+    },
+    avg30: function (a) {
+      var v = avg30(a);
+      return v == null ? { value: "—", caption: "avg views, no reels in 30 days" }
+        : { value: compact(v), caption: "avg views, last 30 days" };
     },
     engagement: function (a) {
       return a.engagement != null ? { value: pct(a.engagement), caption: "engagement" }
@@ -678,6 +725,57 @@
     return card;
   }
 
+  // ---- fit=1: size the reel tiles so the whole card fits the embed without scrolling ----
+  // Tries every column count (or one row) and each detail level (caption + date, date only,
+  // thumbnail only), and keeps the biggest tiles that still fit the space left in the card.
+  var TILE_RATIO = 4 / 3, TILE_GAP = 12;
+  var DETAIL_LEVELS = [
+    { extra: 70, min: 140, cls: "" },              // caption (2 lines) + date/likes
+    { extra: 26, min: 120, cls: "no-cap" },         // date/likes only (needs room for "Nov 11  ♥ 1K · 10")
+    { extra: 0, min: 0, cls: "no-cap no-meta" }     // thumbnail + views
+  ];
+  function layoutGrid(grid, box) {
+    var n = grid.children.length;
+    if (!n) return;
+    var W = box.clientWidth, H = box.clientHeight;
+    var levels = grid.dataset.details === "0" ? DETAIL_LEVELS.slice(2) : DETAIL_LEVELS;
+    var pick = null;
+    for (var li = 0; li < levels.length; li++) {
+      var lv = levels[li], best = null;
+      for (var cols = rowLayout ? n : 1; cols <= n; cols++) {
+        var rows = Math.ceil(n / cols);
+        var byW = (W - (cols - 1) * TILE_GAP) / cols;
+        var byH = ((H - (rows - 1) * TILE_GAP) / rows - lv.extra) / TILE_RATIO;
+        var w = Math.floor(Math.min(byW, byH));
+        if (!best || w > best.w) best = { cols: cols, w: w, cls: lv.cls };
+      }
+      pick = best;
+      if (best.w >= lv.min) break;
+    }
+    var w = Math.max(pick.w, 36);
+    grid.classList.remove("no-cap", "no-meta");
+    pick.cls.split(" ").forEach(function (c) { if (c) grid.classList.add(c); });
+    grid.classList.remove("row");
+    grid.style.gridTemplateColumns = "repeat(" + pick.cols + ", " + w + "px)";
+    grid.style.setProperty("--tw", w + "px");
+  }
+  function applyFit() {
+    var cards = mount.querySelectorAll(".grid > .card");
+    if (cards.length !== 1) return;                 // fit only applies to a single card
+    var grids = cards[0].querySelectorAll(".reel-grid");
+    if (!grids.length) return;
+    document.documentElement.classList.add("fit");
+    Array.prototype.forEach.call(grids, function (grid) {
+      var box = el("div", "fitbox");
+      grid.parentNode.insertBefore(box, grid);
+      box.appendChild(grid);
+      var run = function () { layoutGrid(grid, box); };
+      run();
+      if (window.ResizeObserver) new ResizeObserver(run).observe(box);
+      else window.addEventListener("resize", run);
+    });
+  }
+
   function render(data) {
     var accounts = data.accounts || [];
     if (wanted.length) {
@@ -712,6 +810,7 @@
       });
       mount.innerHTML = "";
       mount.appendChild(grid);
+      if (fitMode) applyFit();
       return;
     }
     accounts.forEach(function (acct, i) {
@@ -721,6 +820,7 @@
     });
     mount.innerHTML = "";
     mount.appendChild(grid);
+    if (fitMode) applyFit();
   }
 
   fetch("data.json?t=" + Date.now(), { cache: "no-store" })
