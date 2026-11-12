@@ -159,11 +159,43 @@
   html.fit .reel-grid .thumb .badge { font-size: clamp(9px, calc(var(--tw, 200px) * 0.08), 12px); padding: 3px 7px; }
   html.fit .reel-grid .thumb { border-radius: clamp(8px, calc(var(--tw, 200px) * 0.1), 16px); }
 
+  /* Instagram mark (logo=1): Meta's official glyph from docs/assets/, top-right of each card.
+     Shown black on light cards and white on dark cards; falls back to an "Instagram" label. */
+  html.logo .grid > .card { position: relative; }
+  .ig-mark { position: absolute; top: 24px; right: 26px; display: flex; align-items: center; pointer-events: none; }
+  .ig-mark img { width: 24px; height: 24px; display: block; }
+  :root[data-theme="dark"] .ig-mark img { filter: invert(1); }
+  .ig-mark span { color: var(--muted); font-size: 13px; font-weight: 600; letter-spacing: 0.01em; }
+  .tile .ig-mark { top: 16px; right: 16px; }
+  .tile .ig-mark img { width: 18px; height: 18px; }
+  .small .ig-mark { top: 20px; right: 22px; }
+  html.logo .reelgrid { padding-top: 48px; }
+  .reelgrid .ig-mark { top: 14px; right: 18px; }
+  .reelgrid .ig-mark img { width: 20px; height: 20px; }
+  html.logo .spot-kicker, html.logo .tile-cap { padding-right: 30px; }
+  html.logo-text .spot-kicker { padding-right: 76px; }
+
   @media (max-width: 480px) {
     .reel-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .reels-stats .num { font-size: 22px; }
     .reels-stats.four, .ov-stats.four { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; row-gap: 16px; }
   }
+
+  /* Instagram mark (logo=1): Meta's official glyph from docs/assets/, top-right of each card.
+     Shown black on light cards and white on dark cards; falls back to an "Instagram" label. */
+  html.logo .grid > .card { position: relative; }
+  .ig-mark { position: absolute; top: 24px; right: 26px; display: flex; align-items: center; pointer-events: none; }
+  .ig-mark img { width: 24px; height: 24px; display: block; }
+  :root[data-theme="dark"] .ig-mark img { filter: invert(1); }
+  .ig-mark span { color: var(--muted); font-size: 13px; font-weight: 600; letter-spacing: 0.01em; }
+  .tile .ig-mark { top: 16px; right: 16px; }
+  .tile .ig-mark img { width: 18px; height: 18px; }
+  .small .ig-mark { top: 20px; right: 22px; }
+  html.logo .reelgrid { padding-top: 48px; }
+  .reelgrid .ig-mark { top: 14px; right: 18px; }
+  .reelgrid .ig-mark img { width: 20px; height: 20px; }
+  html.logo .spot-kicker, html.logo .tile-cap { padding-right: 30px; }
+  html.logo-text .spot-kicker { padding-right: 76px; }
 
   @media (max-width: 480px) {
     body { padding: 10px; }
@@ -218,6 +250,22 @@
     .spot .thumb { max-width: 300px; width: 100%; }
     .spot-cap { font-size: 19px; }
   }
+  /* Instagram mark (logo=1): Meta's official glyph from docs/assets/, top-right of each card.
+     Shown black on light cards and white on dark cards; falls back to an "Instagram" label. */
+  html.logo .grid > .card { position: relative; }
+  .ig-mark { position: absolute; top: 24px; right: 26px; display: flex; align-items: center; pointer-events: none; }
+  .ig-mark img { width: 24px; height: 24px; display: block; }
+  :root[data-theme="dark"] .ig-mark img { filter: invert(1); }
+  .ig-mark span { color: var(--muted); font-size: 13px; font-weight: 600; letter-spacing: 0.01em; }
+  .tile .ig-mark { top: 16px; right: 16px; }
+  .tile .ig-mark img { width: 18px; height: 18px; }
+  .small .ig-mark { top: 20px; right: 22px; }
+  html.logo .reelgrid { padding-top: 48px; }
+  .reelgrid .ig-mark { top: 14px; right: 18px; }
+  .reelgrid .ig-mark img { width: 20px; height: 20px; }
+  html.logo .spot-kicker, html.logo .tile-cap { padding-right: 30px; }
+  html.logo-text .spot-kicker { padding-right: 76px; }
+
   @media (max-width: 480px) {
     .tile { padding: 16px 18px 14px; }
     .tile.fill { min-height: min(calc(100vh - 20px), 240px); }
@@ -256,6 +304,10 @@
   var mount = document.getElementById("root");
   var rowLayout = params.get("layout") === "row";
   var fitMode = params.get("fit") === "1";
+  var logoMode = params.get("logo") === "1";
+  if (logoMode) document.documentElement.classList.add("logo");
+  // Meta's official glyph, black version. SVG preferred; PNG works too.
+  var LOGO_SOURCES = ["assets/instagram-glyph.svg", "assets/instagram-glyph.png"];
   // How many reels a view shows: the link's value, else 3 in a one-row layout, else the view's default.
   function reelCount(raw, def) {
     var n = Number(raw);
@@ -759,6 +811,24 @@
     grid.style.gridTemplateColumns = "repeat(" + pick.cols + ", " + w + "px)";
     grid.style.setProperty("--tw", w + "px");
   }
+  // ---- logo=1: Instagram mark in the top-right corner of each card ----
+  function addLogos() {
+    Array.prototype.forEach.call(mount.querySelectorAll(".grid > .card"), function (card) {
+      var mark = el("div", "ig-mark");
+      var img = el("img");
+      var sources = LOGO_SOURCES.slice();
+      img.alt = "Instagram";
+      img.onerror = function () {
+        if (sources.length) { img.src = sources.shift(); return; }
+        img.replaceWith(el("span", null, "Instagram"));
+        document.documentElement.classList.add("logo-text");
+      };
+      img.src = sources.shift();
+      mark.appendChild(img);
+      card.appendChild(mark);
+    });
+  }
+
   function applyFit() {
     var cards = mount.querySelectorAll(".grid > .card");
     if (cards.length !== 1) return;                 // fit only applies to a single card
@@ -802,6 +872,7 @@
       accounts.forEach(function (acct) { grid.appendChild(statTile(acct, statName, accounts.length === 1)); });
       mount.innerHTML = "";
       mount.appendChild(grid);
+      if (logoMode) addLogos();
       return;
     }
     if (view === "overview" || view === "spotlight" || view === "reelgrid") {
@@ -810,6 +881,7 @@
       });
       mount.innerHTML = "";
       mount.appendChild(grid);
+      if (logoMode) addLogos();
       if (fitMode) applyFit();
       return;
     }
@@ -820,6 +892,7 @@
     });
     mount.innerHTML = "";
     mount.appendChild(grid);
+    if (logoMode) addLogos();
     if (fitMode) applyFit();
   }
 

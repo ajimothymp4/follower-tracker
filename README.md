@@ -52,6 +52,8 @@ All views accept `theme` and `bg=none`.
 
 **`fit=1`** (reels, reelgrid, overview with reels): the card fills the embed and the reel tiles resize so everything fits without scrolling. It picks the column count that gives the biggest tiles, and hides captions, then dates/likes, when tiles get small. Works with one account per embed.
 
+**`logo=1`** (every view): the Instagram glyph in the top-right corner of each card, black on light cards and white on dark ones. It uses Meta's official glyph file at `docs/assets/instagram-glyph.svg` (or `.png`), unaltered; until that file is added it shows a small "Instagram" label instead.
+
 **`layout=row`** (reels, reelgrid, overview with reels): all reels in one row. Shows 3 reels unless `count=` (or `reels=` on the overview) says otherwise. Combine with `fit=1` to size the row to the embed.
 
 The reels and overview stat rows show four numbers: avg views of the last 6 reels, top reel (30 days), engagement, and avg views of reels posted in the last 30 days.
