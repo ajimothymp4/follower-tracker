@@ -33,13 +33,16 @@ Add a row to **IG Accounts** with their handle (without the @) and check **Activ
 | Overview: followers, chart, weekly change, and reel stats | `?handle=tyler_lingle&view=overview` |
 | One number in a compact tile | `?handle=tyler_lingle&view=stat&stat=growth7` |
 | Top reel of the last 30 days | `?handle=remingtontramsey&view=spotlight` |
+| Overview with the newest reels underneath | `?handle=remingtontramsey&view=overview&reels=6` |
+| Just the newest reels, nothing else | `?handle=remingtontramsey&view=reelgrid` |
 
 Options: `&theme=light` / `&theme=dark` (the default follows the device), `&size=large` / `&size=small`, `&chart=0`, `&stats=1` (engagement), `&days=N`, `&view=reels` (`&count=N`), `&bg=none`.
 
 | View | What it shows | Works with |
 |---|---|---|
 | `view=reels` | Recent reels grid with avg views, top reel, and engagement | `count=N` |
-| `view=overview` | The large card (follower count, growth chart, weekly change) plus a row with avg views of the last 6 reels, top reel views in the last 30 days, and engagement. Stats without data are hidden. | `chart=0`, `days=N` |
+| `view=overview` | The large card (follower count, growth chart, weekly change) plus a row with avg views of the last 6 reels, top reel views in the last 30 days, and engagement. Stats without data are hidden. | `chart=0`, `days=N`, `reels=N` (adds the newest N reels underneath, max 12), `details=0` (reel tiles show only thumbnail + views) |
+| `view=reelgrid` | Only the newest reels as tiles (thumbnail, views, caption, date, likes, comments). No follower numbers, handle, or stats. | `count=N` (default 6), `details=0` (thumbnail + views only) |
 | `view=stat&stat=NAME` | A compact tile with one big number, a caption, and the handle. It fits embeds as small as 260×160. | `stat=` one of the names below |
 | `view=spotlight` | The most-viewed reel posted in the last 30 days, with thumbnail, caption, date, views, likes, comments, and 7-day views. The whole card opens the reel. | |
 
