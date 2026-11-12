@@ -159,12 +159,11 @@
   html.fit .reel-grid .thumb .badge { font-size: clamp(9px, calc(var(--tw, 200px) * 0.08), 12px); padding: 3px 7px; }
   html.fit .reel-grid .thumb { border-radius: clamp(8px, calc(var(--tw, 200px) * 0.1), 16px); }
 
-  /* Instagram mark (logo=1): Meta's official glyph from docs/assets/, top-right of each card.
-     Shown black on light cards and white on dark cards; falls back to an "Instagram" label. */
+  /* Instagram mark (logo=1): the full-color Instagram logo from docs/assets/, top-right of each card.
+     Falls back to an "Instagram" label if the file can't load. */
   html.logo .grid > .card { position: relative; }
   .ig-mark { position: absolute; top: 24px; right: 26px; display: flex; align-items: center; pointer-events: none; }
   .ig-mark img { width: 24px; height: 24px; display: block; }
-  :root[data-theme="dark"] .ig-mark img { filter: invert(1); }
   .ig-mark span { color: var(--muted); font-size: 13px; font-weight: 600; letter-spacing: 0.01em; }
   .tile .ig-mark { top: 16px; right: 16px; }
   .tile .ig-mark img { width: 18px; height: 18px; }
@@ -181,12 +180,11 @@
     .reels-stats.four, .ov-stats.four { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; row-gap: 16px; }
   }
 
-  /* Instagram mark (logo=1): Meta's official glyph from docs/assets/, top-right of each card.
-     Shown black on light cards and white on dark cards; falls back to an "Instagram" label. */
+  /* Instagram mark (logo=1): the full-color Instagram logo from docs/assets/, top-right of each card.
+     Falls back to an "Instagram" label if the file can't load. */
   html.logo .grid > .card { position: relative; }
   .ig-mark { position: absolute; top: 24px; right: 26px; display: flex; align-items: center; pointer-events: none; }
   .ig-mark img { width: 24px; height: 24px; display: block; }
-  :root[data-theme="dark"] .ig-mark img { filter: invert(1); }
   .ig-mark span { color: var(--muted); font-size: 13px; font-weight: 600; letter-spacing: 0.01em; }
   .tile .ig-mark { top: 16px; right: 16px; }
   .tile .ig-mark img { width: 18px; height: 18px; }
@@ -250,12 +248,11 @@
     .spot .thumb { max-width: 300px; width: 100%; }
     .spot-cap { font-size: 19px; }
   }
-  /* Instagram mark (logo=1): Meta's official glyph from docs/assets/, top-right of each card.
-     Shown black on light cards and white on dark cards; falls back to an "Instagram" label. */
+  /* Instagram mark (logo=1): the full-color Instagram logo from docs/assets/, top-right of each card.
+     Falls back to an "Instagram" label if the file can't load. */
   html.logo .grid > .card { position: relative; }
   .ig-mark { position: absolute; top: 24px; right: 26px; display: flex; align-items: center; pointer-events: none; }
   .ig-mark img { width: 24px; height: 24px; display: block; }
-  :root[data-theme="dark"] .ig-mark img { filter: invert(1); }
   .ig-mark span { color: var(--muted); font-size: 13px; font-weight: 600; letter-spacing: 0.01em; }
   .tile .ig-mark { top: 16px; right: 16px; }
   .tile .ig-mark img { width: 18px; height: 18px; }
@@ -306,8 +303,8 @@
   var fitMode = params.get("fit") === "1";
   var logoMode = params.get("logo") === "1";
   if (logoMode) document.documentElement.classList.add("logo");
-  // Meta's official glyph, black version. SVG preferred; PNG works too.
-  var LOGO_SOURCES = ["assets/instagram-glyph.svg", "assets/instagram-glyph.png"];
+  // The Instagram logo file (full-color icon), shown as-is on light and dark cards.
+  var LOGO_SOURCES = ["assets/instagram-logo.svg"];
   // How many reels a view shows: the link's value, else 3 in a one-row layout, else the view's default.
   function reelCount(raw, def) {
     var n = Number(raw);
