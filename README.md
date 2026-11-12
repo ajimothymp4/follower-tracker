@@ -31,7 +31,7 @@ Add a row to **IG Accounts** with their handle (without the @) and check **Activ
 | All clients, first one large | `https://<user>.github.io/<repo>/?feature=first` |
 | Several specific accounts | `?handle=one,two,three` |
 
-Options: `&theme=light` / `&theme=dark` (the default follows the device), `&size=large` / `&size=small`, `&bg=none`.
+Options: `&theme=light` / `&theme=dark` (the default follows the device), `&size=large` / `&size=small`, `&chart=0`, `&stats=1` (engagement), `&days=N`, `&view=reels` (`&count=N`), `&bg=none`.
 
 ## If something breaks
 

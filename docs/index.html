@@ -293,7 +293,7 @@
     card.appendChild(el("div", "count", fmt(acct.followers)));
     var labelRow = el("div", "labelrow");
     labelRow.appendChild(el("div", "label", "followers"));
-    if (acct.engagement != null && params.get("stats") !== "0") {
+    if (acct.engagement != null && params.get("stats") === "1") {
       var st = el("div", "stat");
       st.title = "Typical (median) likes + comments per post, divided by followers, last 12 posts";
       st.appendChild(el("b", null, (acct.engagement * 100).toFixed(1) + "%"));
