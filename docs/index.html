@@ -125,7 +125,7 @@
   .reel-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
   .reel { display: flex; flex-direction: column; gap: 8px; color: inherit; text-decoration: none; min-width: 0; }
   .reel:focus-visible { outline: 2px solid var(--up); outline-offset: 3px; border-radius: 16px; }
-  .thumb { position: relative; aspect-ratio: 9 / 16; border-radius: 16px; overflow: hidden; background: var(--avatar-bg); }
+  .thumb { position: relative; aspect-ratio: 3 / 4; border-radius: 16px; overflow: hidden; background: var(--avatar-bg); }
   .thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
   .thumb .shade { position: absolute; inset: auto 0 0 0; height: 45%; background: linear-gradient(to top, rgba(0,0,0,.72), rgba(0,0,0,0)); }
   .thumb .views { position: absolute; left: 10px; bottom: 9px; color: #fff; font-weight: 700; font-size: 18px; display: flex; align-items: center; gap: 5px; font-variant-numeric: tabular-nums; }
@@ -295,7 +295,7 @@
     labelRow.appendChild(el("div", "label", "followers"));
     if (acct.engagement != null && params.get("stats") !== "0") {
       var st = el("div", "stat");
-      st.title = "Average likes + comments per post, divided by followers (last 12 posts)";
+      st.title = "Typical (median) likes + comments per post, divided by followers, last 12 posts";
       st.appendChild(el("b", null, (acct.engagement * 100).toFixed(1) + "%"));
       st.appendChild(document.createTextNode(" engagement"));
       labelRow.appendChild(st);

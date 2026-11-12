@@ -194,12 +194,17 @@ def is_reel(m):
 
 
 def engagement_rate(media, followers):
-    """Average (likes + comments) / followers over recent posts that show like counts."""
+    """Typical (median) likes + comments per post, divided by followers, over recent posts.
+    Median, so one viral reel doesn't inflate the number."""
     if not followers:
         return None
-    rates = [((m.get("like_count") or 0) + (m.get("comments_count") or 0)) / followers
-             for m in media[:ENGAGEMENT_POSTS] if m.get("like_count") is not None]
-    return round(sum(rates) / len(rates), 4) if rates else None
+    rates = sorted(((m.get("like_count") or 0) + (m.get("comments_count") or 0)) / followers
+                   for m in media[:ENGAGEMENT_POSTS] if m.get("like_count") is not None)
+    if not rates:
+        return None
+    mid = len(rates) // 2
+    rate = rates[mid] if len(rates) % 2 else (rates[mid - 1] + rates[mid]) / 2
+    return round(rate, 4)
 
 
 # (hours after posting, extra hours allowed) — the overnight runs land once a day, so a
