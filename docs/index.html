@@ -133,6 +133,12 @@
   :root[data-theme="dark"] .thumb .badge { color: #000; }
   .reel-meta { display: flex; justify-content: space-between; gap: 6px; color: var(--muted); font-size: 13px; font-variant-numeric: tabular-nums; white-space: nowrap; }
   .reel-cap { font-size: 14px; line-height: 1.3; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+  /* overview &reels=N and view=reelgrid */
+  .ov-reels { margin-top: 26px; padding-top: 22px; border-top: 1px solid var(--ring); }
+  .ov-reels-title { font-weight: 700; font-size: 18px; margin-bottom: 14px; }
+  .reelgrid { grid-column: 1 / -1; padding: 16px; }
+  .reelgrid .pending { color: var(--muted); font-size: 15px; padding: 12px; }
+
   @media (max-width: 480px) {
     .reel-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .reels-stats .num { font-size: 22px; }
@@ -143,6 +149,58 @@
     .card { padding: 22px 22px 20px; border-radius: 24px; }
     .large .bottom { flex-direction: column; align-items: flex-start; }
     .large .change { align-items: flex-start; }
+  }
+
+  /* overview (view=overview): large card + 3-stat row */
+  .ov-stats {
+    display: grid; gap: 12px; margin-top: 26px; padding-top: 22px;
+    border-top: 1px solid var(--ring);
+  }
+  .ov-stats .num { font-weight: 700; font-size: 28px; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .ov-stats .cap { color: var(--muted); font-size: 14px; margin-top: 2px; }
+
+  /* single-stat tile (view=stat) */
+  .tile { container-type: inline-size; padding: 20px 22px 18px; justify-content: space-between; gap: 12px; }
+  .tile.fill { min-height: min(calc(100vh - 32px), 240px); }
+  .tile-num {
+    font-weight: 700; letter-spacing: -0.035em; line-height: 0.95;
+    font-variant-numeric: tabular-nums; white-space: nowrap;
+    font-size: clamp(34px, 21cqw, 72px);
+  }
+  .tile-num.up { color: var(--up); }
+  .tile-num.down { color: var(--down); }
+  .tile-cap { color: var(--muted); font-size: clamp(14px, 6.5cqw, 18px); margin-top: 6px; line-height: 1.25; }
+  .tile-who { display: flex; align-items: center; gap: 8px; min-width: 0; }
+  .tile-who .avatar { width: 26px; height: 26px; font-size: 10px; }
+  .tile-who .handle { font-size: 14px; font-weight: 600; }
+
+  /* top-reel spotlight (view=spotlight) */
+  a.spot { color: inherit; text-decoration: none; transition: box-shadow .15s ease; }
+  a.spot:hover { box-shadow: var(--shadow), 0 0 0 2px var(--ring); }
+  a.spot:focus-visible { outline: 3px solid var(--up); outline-offset: 3px; }
+  .spot-body { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 3fr); gap: 28px; align-items: start; }
+  .spot .thumb { border-radius: 20px; }
+  .spot .thumb .badge { top: 12px; left: 12px; font-size: 13px; }
+  .spot-info { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+  .spot-kicker { color: var(--muted); font-size: 15px; font-weight: 500; }
+  .spot-cap { font-size: 22px; font-weight: 600; line-height: 1.3; letter-spacing: -0.01em; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; }
+  .spot-date { color: var(--muted); font-size: 16px; }
+  .spot-views { font-weight: 700; font-size: clamp(44px, 9vw, 64px); letter-spacing: -0.035em; line-height: 0.95; font-variant-numeric: tabular-nums; margin-top: 6px; }
+  .spot-views + .cap { color: var(--muted); font-size: 16px; margin-top: -8px; }
+  .spot-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(84px, 1fr)); gap: 12px; padding-top: 16px; border-top: 1px solid var(--ring); }
+  .spot-stats .num { font-weight: 700; font-size: 22px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .spot-stats .cap { color: var(--muted); font-size: 14px; margin-top: 2px; }
+  .spot-open { color: var(--muted); font-size: 14px; display: flex; align-items: center; gap: 6px; }
+  .spot .pending { color: var(--muted); font-size: 16px; line-height: 1.5; }
+  @media (max-width: 560px) {
+    .spot-body { grid-template-columns: minmax(0, 1fr); gap: 20px; }
+    .spot .thumb { max-width: 300px; width: 100%; }
+    .spot-cap { font-size: 19px; }
+  }
+  @media (max-width: 480px) {
+    .tile { padding: 16px 18px 14px; }
+    .tile.fill { min-height: min(calc(100vh - 20px), 240px); }
+    .ov-stats .num { font-size: 22px; }
   }
 
   .notice {
@@ -388,6 +446,13 @@
       });
     card.appendChild(stats);
 
+    card.appendChild(reelGrid(reels, top));
+    return card;
+  }
+
+  // The grid of reel tiles, shared by the reels, overview (&reels=N) and reelgrid views.
+  // details=false keeps only the thumbnail with its view count.
+  function reelGrid(reels, top, details) {
     var grid = el("div", "reel-grid");
     reels.forEach(function (r) {
       var a = el("a", "reel");
@@ -404,14 +469,212 @@
       var v = el("div", "views"); v.appendChild(playIcon()); v.appendChild(document.createTextNode(compact(r.views)));
       th.appendChild(v);
       a.appendChild(th);
-      a.appendChild(el("div", "reel-cap", r.title));
-      var meta = el("div", "reel-meta");
-      meta.appendChild(el("span", null, postedDate(r.posted)));
-      meta.appendChild(el("span", null, "♥ " + compact(r.likes) + "  ·  " + compact(r.comments)));
-      a.appendChild(meta);
+      if (details !== false) {
+        a.appendChild(el("div", "reel-cap", r.title));
+        var meta = el("div", "reel-meta");
+        meta.appendChild(el("span", null, postedDate(r.posted)));
+        meta.appendChild(el("span", null, "♥ " + compact(r.likes) + "  ·  " + compact(r.comments)));
+        a.appendChild(meta);
+      }
       grid.appendChild(a);
     });
-    card.appendChild(grid);
+    return grid;
+  }
+
+  // Newest reels first, plus the most-viewed reel from the last 30 days (for the "Top" badge).
+  function recentReels(acct, n) {
+    var monthAgo = Date.now() - 30 * 864e5, top = null;
+    (acct.reels || []).forEach(function (r) {
+      if (postedTime(r.posted) >= monthAgo && r.views != null && (!top || r.views > top.views)) top = r;
+    });
+    return { reels: (acct.reels || []).slice(0, n), top: top };
+  }
+
+  // view=reelgrid: just the newest reels, no account info or stats.
+  function reelGridCard(acct) {
+    var n = Number(params.get("count")) || 6;
+    var rr = recentReels(acct, n);
+    var card = el("article", "card reelgrid");
+    card.setAttribute("aria-label", "Newest reels from " + acct.handle);
+    if (!rr.reels.length) {
+      card.appendChild(el("div", "pending", "No reels found yet. They appear after the next daily update."));
+      return card;
+    }
+    card.appendChild(reelGrid(rr.reels, rr.top, params.get("details") !== "0"));
+    return card;
+  }
+
+  // ---- Shared reel numbers for the overview, stat and spotlight views ----
+  function postedTime(iso) { return new Date(iso.replace(/([+-]\d\d)(\d\d)$/, "$1:$2")).getTime(); }
+  function pct(f) { return (f * 100).toFixed(1) + "%"; }
+  function reelNumbers(acct) {
+    var reels = (acct.reels || []).filter(function (r) { return r.posted; }).slice()
+      .sort(function (a, b) { return postedTime(b.posted) - postedTime(a.posted); });
+    var last6 = reels.slice(0, 6).filter(function (r) { return r.views != null; });
+    var monthAgo = Date.now() - 30 * 864e5;
+    var recent = reels.filter(function (r) { return postedTime(r.posted) >= monthAgo; });
+    var top = null;
+    recent.forEach(function (r) { if (r.views != null && (!top || r.views > top.views)) top = r; });
+    return {
+      avg: last6.length ? Math.round(last6.reduce(function (t, r) { return t + r.views; }, 0) / last6.length) : null,
+      avgCount: last6.length,
+      top: top,
+      posts30: acct.reels ? recent.length : null,
+      // data.json only carries the newest few reels; if all of them are recent, the true count may be higher.
+      posts30Capped: reels.length >= 9 && recent.length === reels.length
+    };
+  }
+
+  // view=overview: the large card plus a row of reel stats.
+  function overviewCard(acct) {
+    var card = el("article", "card large overview");
+    card.setAttribute("aria-label", acct.handle + " overview, " + fmt(acct.followers) + " followers");
+    card.appendChild(el("div", "count", fmt(acct.followers)));
+    card.appendChild(el("div", "label", "followers"));
+    if (params.get("chart") !== "0") card.appendChild(chart(acct));
+    var bottom = el("div", "bottom");
+    bottom.appendChild(person(acct));
+    var c = change(acct);
+    var side = el("div", "change");
+    var d = deltaNode(c);
+    if (d) side.appendChild(d);
+    side.appendChild(el("div", "window", c.label));
+    bottom.appendChild(side);
+    card.appendChild(bottom);
+
+    var n = reelNumbers(acct);
+    var items = [];
+    if (n.avg != null) items.push([compact(n.avg), "avg views, last " + n.avgCount + (n.avgCount === 1 ? " reel" : " reels")]);
+    if (n.top) items.push([compact(n.top.views), "top reel, 30 days"]);
+    if (acct.engagement != null) items.push([pct(acct.engagement), "engagement"]);
+    if (items.length) {
+      var stats = el("div", "ov-stats");
+      stats.style.gridTemplateColumns = "repeat(" + items.length + ", minmax(0, 1fr))";
+      items.forEach(function (pair) {
+        var b = el("div");
+        b.appendChild(el("div", "num", pair[0]));
+        b.appendChild(el("div", "cap", pair[1]));
+        stats.appendChild(b);
+      });
+      card.appendChild(stats);
+    }
+
+    // &reels=N adds the newest N reels under the stats.
+    var nReels = Math.min(Number(params.get("reels")) || 0, 12);
+    if (nReels > 0) {
+      var rr = recentReels(acct, nReels);
+      if (rr.reels.length) {
+        var sec = el("div", "ov-reels");
+        sec.appendChild(el("div", "ov-reels-title", "Recent reels"));
+        sec.appendChild(reelGrid(rr.reels, rr.top, params.get("details") !== "0"));
+        card.appendChild(sec);
+      }
+    }
+    return card;
+  }
+
+  // view=stat&stat=NAME: one number in a compact tile.
+  var STATS = {
+    followers: function (a) { return { value: fmt(a.followers), caption: "followers" }; },
+    growth7: function (a) {
+      var c = change(a);
+      if (c.value == null) return { value: "—", caption: "followers, tracking started" };
+      return { value: signed(c.value), tone: c.value > 0 ? "up" : c.value < 0 ? "down" : "",
+        caption: a.change7 != null ? "followers this week" : "followers " + c.label };
+    },
+    avgviews: function (a) {
+      var n = reelNumbers(a);
+      return n.avg == null ? { value: "—", caption: "avg views, no reels yet" }
+        : { value: compact(n.avg), caption: "avg views, last " + n.avgCount + (n.avgCount === 1 ? " reel" : " reels") };
+    },
+    topreel: function (a) {
+      var n = reelNumbers(a);
+      return n.top ? { value: compact(n.top.views), caption: "views on top reel, 30 days" }
+        : { value: "—", caption: "no reels in the last 30 days" };
+    },
+    engagement: function (a) {
+      return a.engagement != null ? { value: pct(a.engagement), caption: "engagement" }
+        : { value: "—", caption: "engagement, not available yet" };
+    },
+    posts30: function (a) {
+      var n = reelNumbers(a);
+      if (n.posts30 == null) return { value: "—", caption: "reels posted, 30 days" };
+      return { value: fmt(n.posts30) + (n.posts30Capped ? "+" : ""),
+        caption: (n.posts30 === 1 ? "reel" : "reels") + " posted, 30 days" };
+    }
+  };
+
+  function statTile(acct, name, fill) {
+    var s = STATS[name](acct);
+    var card = el("article", "card tile" + (fill ? " fill" : ""));
+    card.setAttribute("aria-label", "@" + acct.handle + ": " + s.value.replace("—", "no data") + " " + s.caption);
+    var top = el("div");
+    top.appendChild(el("div", "tile-num" + (s.tone ? " " + s.tone : ""), s.value));
+    top.appendChild(el("div", "tile-cap", s.caption));
+    card.appendChild(top);
+    var who = el("div", "tile-who");
+    var av = avatar(acct);
+    who.appendChild(av);
+    who.appendChild(el("div", "handle", "@" + acct.handle));
+    card.appendChild(who);
+    return card;
+  }
+
+  // view=spotlight: the most-viewed reel from the last 30 days.
+  function spotlightCard(acct) {
+    var top = reelNumbers(acct).top;
+    if (!top) {
+      var empty = el("article", "card large spot");
+      empty.setAttribute("aria-label", "Top reel for " + acct.handle);
+      var head = el("div", "reels-head");
+      head.appendChild(avatar(acct));
+      var who = el("div", "who");
+      who.appendChild(el("div", "reels-title", "Top reel"));
+      who.appendChild(el("div", "reels-sub", "@" + acct.handle + " · last 30 days"));
+      head.appendChild(who);
+      empty.appendChild(head);
+      empty.appendChild(el("div", "pending", "No new reels in the last 30 days. The top one will show up here after the next reel is posted."));
+      return empty;
+    }
+    var card = el("a", "card large spot");
+    card.href = top.link; card.target = "_blank"; card.rel = "noopener";
+    card.setAttribute("aria-label", "Top reel from @" + acct.handle + " in the last 30 days: " + (top.title || "untitled") +
+      ". " + fmt(top.views) + " views. Opens on Instagram in a new tab.");
+
+    var body = el("div", "spot-body");
+    var th = el("div", "thumb");
+    if (top.thumb) {
+      var img = el("img"); img.alt = "Reel thumbnail"; img.referrerPolicy = "no-referrer"; img.src = top.thumb;
+      img.onerror = function () { img.remove(); };
+      th.appendChild(img);
+    }
+    th.appendChild(el("div", "badge", "Top reel"));
+    body.appendChild(th);
+
+    var info = el("div", "spot-info");
+    var who2 = el("div", "tile-who");
+    who2.appendChild(avatar(acct));
+    who2.appendChild(el("div", "spot-kicker", "@" + acct.handle + " · top reel, last 30 days"));
+    info.appendChild(who2);
+    if (top.title) info.appendChild(el("div", "spot-cap", top.title));
+    info.appendChild(el("div", "spot-date", "Posted " + new Date(postedTime(top.posted))
+      .toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })));
+    info.appendChild(el("div", "spot-views", fmt(top.views)));
+    info.appendChild(el("div", "cap", "views"));
+    var stats = el("div", "spot-stats");
+    [[top.likes, "likes"], [top.comments, "comments"], [top.v7, "7-day views"]].forEach(function (pair) {
+      if (pair[0] == null) return;
+      var b = el("div");
+      b.appendChild(el("div", "num", compact(pair[0])));
+      b.appendChild(el("div", "cap", pair[1]));
+      stats.appendChild(b);
+    });
+    if (stats.childNodes.length) info.appendChild(stats);
+    var open = el("div", "spot-open", "Open on Instagram ↗");
+    open.setAttribute("aria-hidden", "true");
+    info.appendChild(open);
+    body.appendChild(info);
+    card.appendChild(body);
     return card;
   }
 
@@ -432,6 +695,25 @@
     }
     var grid = el("div", "grid");
     var view = params.get("view");
+    if (view === "stat") {
+      var statName = (params.get("stat") || "followers").toLowerCase();
+      if (!STATS[statName]) {
+        notice("Unknown stat \"" + statName + "\". Use one of: " + Object.keys(STATS).join(", ") + ".");
+        return;
+      }
+      accounts.forEach(function (acct) { grid.appendChild(statTile(acct, statName, accounts.length === 1)); });
+      mount.innerHTML = "";
+      mount.appendChild(grid);
+      return;
+    }
+    if (view === "overview" || view === "spotlight" || view === "reelgrid") {
+      accounts.forEach(function (acct) {
+        grid.appendChild(view === "overview" ? overviewCard(acct) : view === "spotlight" ? spotlightCard(acct) : reelGridCard(acct));
+      });
+      mount.innerHTML = "";
+      mount.appendChild(grid);
+      return;
+    }
     accounts.forEach(function (acct, i) {
       if (view === "reels") { grid.appendChild(reelsCard(acct)); grid.lastChild.classList.add("large"); return; }
       var big = size === "large" || (size !== "small" && (wanted.length === 1 || (!wanted.length && i === 0 && params.get("feature") === "first")));
