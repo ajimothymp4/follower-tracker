@@ -36,6 +36,7 @@ jobs:
           IG_USER_ID: "17841401665501406"
           NOTION_ACCOUNTS_DB: "7f8bee63d83a4e3087d27d6b5a7a0067"
           NOTION_SNAPSHOTS_DB: "ec89d5102a6943f59cd3e69fb76bb143"
+          NOTION_REELS_DB: "c0324a6cc4544393b59a5c5edf9f32cf"
         run: python tracker.py
 
       - name: Save data for the widget

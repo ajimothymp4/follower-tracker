@@ -91,7 +91,7 @@
   .chart .axis span { position: absolute; top: 0; white-space: nowrap; transform: translateX(-50%); }
   .chart .axis span:first-child { transform: none; }
   .chart .axis span:last-child { transform: translateX(-100%); }
-  .chart .pending { color: var(--muted); font-size: 15px; }
+  .chart .pending, .reels .pending { color: var(--muted); font-size: 15px; }
 
   /* large card */
   .large .count { font-size: clamp(64px, 14vw, 120px); }
@@ -108,6 +108,35 @@
   .small .avatar { width: 44px; height: 44px; font-size: 15px; }
   .small .handle { font-size: 18px; }
   .small .name { font-size: 16px; }
+
+  /* engagement stat */
+  .labelrow { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+  .stat { color: var(--muted); font-size: 16px; white-space: nowrap; }
+  .stat b { color: var(--ink); font-weight: 600; }
+
+  /* recent reels */
+  .reels-head { display: flex; align-items: center; gap: 14px; margin-bottom: 22px; }
+  .reels-head .who { flex: 1; }
+  .reels-title { font-weight: 700; font-size: 22px; }
+  .reels-sub { color: var(--muted); font-size: 16px; }
+  .reels-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-bottom: 22px; }
+  .reels-stats .num { font-weight: 700; font-size: 28px; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+  .reels-stats .cap { color: var(--muted); font-size: 14px; margin-top: 2px; }
+  .reel-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+  .reel { display: flex; flex-direction: column; gap: 8px; color: inherit; text-decoration: none; min-width: 0; }
+  .reel:focus-visible { outline: 2px solid var(--up); outline-offset: 3px; border-radius: 16px; }
+  .thumb { position: relative; aspect-ratio: 9 / 16; border-radius: 16px; overflow: hidden; background: var(--avatar-bg); }
+  .thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .thumb .shade { position: absolute; inset: auto 0 0 0; height: 45%; background: linear-gradient(to top, rgba(0,0,0,.72), rgba(0,0,0,0)); }
+  .thumb .views { position: absolute; left: 10px; bottom: 9px; color: #fff; font-weight: 700; font-size: 18px; display: flex; align-items: center; gap: 5px; font-variant-numeric: tabular-nums; }
+  .thumb .badge { position: absolute; top: 8px; left: 8px; background: var(--up); color: #fff; font-size: 12px; font-weight: 700; padding: 4px 8px; border-radius: 999px; }
+  :root[data-theme="dark"] .thumb .badge { color: #000; }
+  .reel-meta { display: flex; justify-content: space-between; gap: 6px; color: var(--muted); font-size: 13px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .reel-cap { font-size: 14px; line-height: 1.3; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+  @media (max-width: 480px) {
+    .reel-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .reels-stats .num { font-size: 22px; }
+  }
 
   @media (max-width: 480px) {
     body { padding: 10px; }
@@ -262,7 +291,16 @@
     var card = el("article", "card large");
     card.setAttribute("aria-label", acct.handle + ", " + fmt(acct.followers) + " followers");
     card.appendChild(el("div", "count", fmt(acct.followers)));
-    card.appendChild(el("div", "label", "followers"));
+    var labelRow = el("div", "labelrow");
+    labelRow.appendChild(el("div", "label", "followers"));
+    if (acct.engagement != null && params.get("stats") !== "0") {
+      var st = el("div", "stat");
+      st.title = "Average likes + comments per post, divided by followers (last 12 posts)";
+      st.appendChild(el("b", null, (acct.engagement * 100).toFixed(1) + "%"));
+      st.appendChild(document.createTextNode(" engagement"));
+      labelRow.appendChild(st);
+    }
+    card.appendChild(labelRow);
     if (params.get("chart") !== "0") card.appendChild(chart(acct));
     var bottom = el("div", "bottom");
     bottom.appendChild(person(acct));
@@ -294,6 +332,89 @@
     mount.appendChild(el("p", "notice", text));
   }
 
+  function compact(n) {
+    if (n == null) return "—";
+    if (n >= 1e6) return (n / 1e6).toFixed(n >= 1e7 ? 0 : 1).replace(/\.0$/, "") + "M";
+    if (n >= 1e4) return Math.round(n / 1e3) + "K";
+    if (n >= 1e3) return (n / 1e3).toFixed(1).replace(/\.0$/, "") + "K";
+    return String(n);
+  }
+  function postedDate(iso) {
+    var d = new Date(iso.replace(/([+-]\d\d)(\d\d)$/, "$1:$2"));
+    return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+  }
+  function playIcon() {
+    var svg = svgEl("svg", { width: "14", height: "14", viewBox: "0 0 24 24", "aria-hidden": "true" });
+    svg.appendChild(svgEl("path", { d: "M7 4.5v15l12-7.5z", fill: "currentColor" }));
+    return svg;
+  }
+
+  function reelsCard(acct) {
+    var reels = (acct.reels || []).slice(0, Number(params.get("count")) || 6);
+    var card = el("article", "card reels");
+    card.setAttribute("aria-label", "Recent reels for " + acct.handle);
+
+    var head = el("div", "reels-head");
+    head.appendChild(avatar(acct));
+    var who = el("div", "who");
+    who.appendChild(el("div", "reels-title", "Recent reels"));
+    who.appendChild(el("div", "reels-sub", "@" + acct.handle));
+    head.appendChild(who);
+    card.appendChild(head);
+
+    if (!reels.length) {
+      card.appendChild(el("div", "pending", "No reels found yet. They appear after the next daily update."));
+      return card;
+    }
+
+    var withViews = reels.filter(function (r) { return r.views != null; });
+    var avg = withViews.length ? Math.round(withViews.reduce(function (t, r) { return t + r.views; }, 0) / withViews.length) : null;
+    var monthAgo = Date.now() - 30 * 864e5;
+    var top = null;
+    (acct.reels || []).forEach(function (r) {
+      var t = new Date(r.posted.replace(/([+-]\d\d)(\d\d)$/, "$1:$2")).getTime();
+      if (t >= monthAgo && r.views != null && (!top || r.views > top.views)) top = r;
+    });
+
+    var stats = el("div", "reels-stats");
+    [[compact(avg), "avg views, last " + withViews.length],
+     [top ? compact(top.views) : "—", "top reel, 30 days"],
+     [acct.engagement != null ? (acct.engagement * 100).toFixed(1) + "%" : "—", "engagement"]]
+      .forEach(function (pair) {
+        var b = el("div");
+        b.appendChild(el("div", "num", pair[0]));
+        b.appendChild(el("div", "cap", pair[1]));
+        stats.appendChild(b);
+      });
+    card.appendChild(stats);
+
+    var grid = el("div", "reel-grid");
+    reels.forEach(function (r) {
+      var a = el("a", "reel");
+      a.href = r.link; a.target = "_blank"; a.rel = "noopener";
+      a.setAttribute("aria-label", r.title + ", " + (r.views != null ? fmt(r.views) + " views" : "views unavailable"));
+      var th = el("div", "thumb");
+      if (r.thumb) {
+        var img = el("img"); img.alt = ""; img.loading = "lazy"; img.referrerPolicy = "no-referrer"; img.src = r.thumb;
+        img.onerror = function () { img.remove(); };
+        th.appendChild(img);
+      }
+      th.appendChild(el("div", "shade"));
+      if (top && r.id === top.id) th.appendChild(el("div", "badge", "Top"));
+      var v = el("div", "views"); v.appendChild(playIcon()); v.appendChild(document.createTextNode(compact(r.views)));
+      th.appendChild(v);
+      a.appendChild(th);
+      a.appendChild(el("div", "reel-cap", r.title));
+      var meta = el("div", "reel-meta");
+      meta.appendChild(el("span", null, postedDate(r.posted)));
+      meta.appendChild(el("span", null, "♥ " + compact(r.likes) + "  ·  " + compact(r.comments)));
+      a.appendChild(meta);
+      grid.appendChild(a);
+    });
+    card.appendChild(grid);
+    return card;
+  }
+
   function render(data) {
     var accounts = data.accounts || [];
     if (wanted.length) {
@@ -310,7 +431,9 @@
       return;
     }
     var grid = el("div", "grid");
+    var view = params.get("view");
     accounts.forEach(function (acct, i) {
+      if (view === "reels") { grid.appendChild(reelsCard(acct)); grid.lastChild.classList.add("large"); return; }
       var big = size === "large" || (size !== "small" && (wanted.length === 1 || (!wanted.length && i === 0 && params.get("feature") === "first")));
       grid.appendChild(big ? largeCard(acct) : smallCard(acct));
     });
