@@ -35,6 +35,8 @@ Add a row to **IG Accounts** with their handle (without the @) and check **Activ
 | Top reel of the last 30 days | `?handle=remingtontramsey&view=spotlight` |
 | Overview with the newest reels underneath | `?handle=remingtontramsey&view=overview&reels=6` |
 | Just the newest reels, nothing else | `?handle=remingtontramsey&view=reelgrid` |
+| Any reel view sized to fit the embed, no scrolling | add `&fit=1` |
+| Reels in a single row (3 by default) | add `&layout=row` |
 
 Options: `&theme=light` / `&theme=dark` (the default follows the device), `&size=large` / `&size=small`, `&chart=0`, `&stats=1` (engagement), `&days=N`, `&view=reels` (`&count=N`), `&bg=none`.
 
@@ -48,7 +50,13 @@ Options: `&theme=light` / `&theme=dark` (the default follows the device), `&size
 
 All views accept `theme` and `bg=none`.
 
-`stat=` names: `followers`, `growth7` (change this week; new accounts show change since tracking started), `avgviews` (last 6 reels), `topreel` (top reel views, last 30 days), `engagement`, `posts30` (reels posted in the last 30 days; shows "9+" when every reel the widget receives is that recent). If `stat` is left out, the tile shows `followers`.
+**`fit=1`** (reels, reelgrid, overview with reels): the card fills the embed and the reel tiles resize so everything fits without scrolling. It picks the column count that gives the biggest tiles, and hides captions, then dates/likes, when tiles get small. Works with one account per embed.
+
+**`layout=row`** (reels, reelgrid, overview with reels): all reels in one row. Shows 3 reels unless `count=` (or `reels=` on the overview) says otherwise. Combine with `fit=1` to size the row to the embed.
+
+The reels and overview stat rows show four numbers: avg views of the last 6 reels, top reel (30 days), engagement, and avg views of reels posted in the last 30 days.
+
+`stat=` names: `avg30` (avg views, reels posted in the last 30 days), `followers`, `growth7` (change this week; new accounts show change since tracking started), `avgviews` (last 6 reels), `topreel` (top reel views, last 30 days), `engagement`, `posts30` (reels posted in the last 30 days; shows "9+" when every reel the widget receives is that recent). If `stat` is left out, the tile shows `followers`.
 
 ## If something breaks
 

@@ -43,7 +43,7 @@ MEDIA_FILE = ROOT / "data" / "media.json"
 MEDIA_LIMIT = 40          # recent posts pulled per account each run
 REEL_TRACK_DAYS = 45      # reels younger than this are updated in Notion daily
 REEL_KEEP_DAYS = 400      # reel history kept in the repo
-WIDGET_REELS = 9          # reels sent to the widget per account
+WIDGET_REELS = 12         # reels sent to the widget per account
 ENGAGEMENT_POSTS = 12     # posts used for the engagement rate
 
 
@@ -283,6 +283,13 @@ def update_reels(store, handle, account_page_id, media, now):
         e["pushed"] = values
 
 
+def reel_month_stats(media, now):
+    """Average views and number of reels posted in the last 30 days, from this run's recent posts."""
+    since = now - timedelta(days=30)
+    recent = [m for m in media if is_reel(m) and "timestamp" in m and parse_ts(m["timestamp"]) >= since]
+    views = [m["view_count"] for m in recent if m.get("view_count") is not None]
+    return (round(sum(views) / len(views)) if views else None), len(recent)
+
 def widget_reels(store, handle, today):
     out = []
     reels = sorted(store.get(handle, {}).items(), key=lambda kv: kv[1]["timestamp"], reverse=True)
@@ -349,10 +356,12 @@ def main():
 
         media = (ig.get("media") or {}).get("data", [])
         engagement = engagement_rate(media, followers)
+        avg30, reels30 = reel_month_stats(media, now)
 
         upsert_snapshot(page_id, handle, day, followers, posts, change_prev)
         notion("PATCH", f"pages/{page_id}", {"properties": {
             "Engagement Rate": {"number": engagement},
+            "Avg Reel Views (30d)": {"number": avg30},
             "Followers": {"number": followers},
             "7-Day Change": {"number": change_7},
             "30-Day Change": {"number": change_30},
@@ -383,6 +392,8 @@ def main():
             "trackingSince": first_day,
             "history": [{"date": d, "followers": series[d]["followers"]} for d in recent],
             "engagement": engagement,
+            "avg30": avg30,
+            "reels30": reels30,
             "reels": widget_reels(media_store, handle, today),
         })
         print(f"  ✓ {handle}: {followers:,} followers")
