@@ -22,7 +22,9 @@ Instagram follower and reel tracker for Maximize Media clients.
 
 ## Widget link options (must keep working exactly as they do now)
 handle (comma list), theme=light|dark (default follows device), size=large|small, chart=0, stats=1,
-days=N, view=reels, count=N, feature=first, bg=none.
+days=N, view=reels, count=N, feature=first, bg=none, view=overview (reels=N, details=0),
+view=stat&stat=followers|growth7|avgviews|topreel|engagement|posts30, view=spotlight,
+view=reelgrid (count=N, details=0).
 
 ## Design
 Reuse the CSS variables (--card, --ink, --muted, --up, --down, …), the Inter font, the 28px card radius,
