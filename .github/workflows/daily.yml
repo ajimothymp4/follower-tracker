@@ -9,7 +9,12 @@ on:
     - cron: "37 7 * * *"    # 2:37 AM
     - cron: "7 9 * * *"     # 4:07 AM
     - cron: "37 10 * * *"   # 5:37 AM
-  workflow_dispatch:         # lets you run it any time from the Actions tab
+  workflow_dispatch:
+    inputs:
+      report_month:
+        description: "Build or refresh one month's report now, e.g. 2026-11 (leave empty for a normal run)"
+        required: false
+        default: ""
 
 permissions:
   contents: write
@@ -37,6 +42,8 @@ jobs:
           NOTION_ACCOUNTS_DB: "7f8bee63d83a4e3087d27d6b5a7a0067"
           NOTION_SNAPSHOTS_DB: "ec89d5102a6943f59cd3e69fb76bb143"
           NOTION_REELS_DB: "c0324a6cc4544393b59a5c5edf9f32cf"
+          NOTION_REPORTS_DB: "1e40bd08b6594fcb800adb3d15a3d85a"
+          REPORT_MONTH: ${{ inputs.report_month }}
         run: python tracker.py
 
       - name: Save data for the widget

@@ -174,6 +174,24 @@
   html.logo .spot-kicker, html.logo .tile-cap { padding-right: 30px; }
   html.logo-text .spot-kicker { padding-right: 76px; }
 
+  /* content view (view=content): last 30 days of posts, sortable */
+  .content-controls { display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center; margin-bottom: 18px; }
+  .seg { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+  .seg-label { color: var(--muted); font-size: 13px; margin-right: 2px; }
+  .chip { font: inherit; font-size: 14px; font-weight: 500; min-height: 36px; padding: 0 13px; border-radius: 999px;
+          border: 1px solid var(--ring); background: transparent; color: var(--ink); cursor: pointer; }
+  .chip:hover { border-color: var(--muted); }
+  .chip[aria-pressed="true"] { background: var(--ink); color: var(--card); border-color: var(--ink); }
+  .chip:focus-visible { outline: 2px solid var(--up); outline-offset: 2px; }
+  .content .pending { color: var(--muted); font-size: 15px; padding: 12px 0; }
+  .grid > .content { grid-column: 1 / -1; }
+  .thumb .kind { position: absolute; top: 8px; right: 8px; background: rgba(0,0,0,.62); color: #fff; font-size: 11px;
+                 font-weight: 600; padding: 3px 8px; border-radius: 999px; }
+  .thumb .badge.rank { background: rgba(0,0,0,.62); color: #fff; }
+  .thumb .badge.rank.podium { background: var(--up); }
+  :root[data-theme="dark"] .thumb .badge.rank { color: #fff; }
+  :root[data-theme="dark"] .thumb .badge.rank.podium { color: #000; }
+
   @media (max-width: 480px) {
     .reel-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .reels-stats .num { font-size: 22px; }
@@ -532,14 +550,16 @@
 
   // The grid of reel tiles, shared by the reels, overview (&reels=N) and reelgrid views.
   // details=false keeps only the thumbnail with its view count.
-  function reelGrid(reels, top, details) {
+  // opts.rank: number the tiles (#1, #2, …) instead of the "Top" badge.
+  function reelGrid(reels, top, details, opts) {
     var grid = el("div", "reel-grid" + (rowLayout ? " row" : ""));
     grid.style.setProperty("--n", reels.length);
     if (details === false) grid.dataset.details = "0";
-    reels.forEach(function (r) {
+    reels.forEach(function (r, i) {
       var a = el("a", "reel");
+      var isPost = r.type && r.type !== "reel" && r.views == null;   // photos/carousels have no view count
       a.href = r.link; a.target = "_blank"; a.rel = "noopener";
-      a.setAttribute("aria-label", r.title + ", " + (r.views != null ? fmt(r.views) + " views" : "views unavailable"));
+      a.setAttribute("aria-label", r.title + ", " + (isPost ? fmt(r.likes || 0) + " likes" : r.views != null ? fmt(r.views) + " views" : "views unavailable"));
       var th = el("div", "thumb");
       if (r.thumb) {
         var img = el("img"); img.alt = ""; img.loading = "lazy"; img.referrerPolicy = "no-referrer"; img.src = r.thumb;
@@ -547,8 +567,12 @@
         th.appendChild(img);
       }
       th.appendChild(el("div", "shade"));
-      if (top && r.id === top.id) th.appendChild(el("div", "badge", "Top"));
-      var v = el("div", "views"); v.appendChild(playIcon()); v.appendChild(document.createTextNode(compact(r.views)));
+      if (opts && opts.rank) th.appendChild(el("div", "badge rank" + (i < 3 ? " podium" : ""), "#" + (i + 1)));
+      else if (top && r.id === top.id) th.appendChild(el("div", "badge", "Top"));
+      if (r.type && r.type !== "reel") th.appendChild(el("div", "kind", r.type === "carousel" ? "Carousel" : r.type === "photo" ? "Photo" : "Video"));
+      var v = el("div", "views");
+      if (isPost) v.appendChild(document.createTextNode("\u2665 " + compact(r.likes)));
+      else { v.appendChild(playIcon()); v.appendChild(document.createTextNode(compact(r.views))); }
       th.appendChild(v);
       a.appendChild(th);
       if (details !== false) {
@@ -833,6 +857,10 @@
     if (!grids.length) return;
     document.documentElement.classList.add("fit");
     Array.prototype.forEach.call(grids, function (grid) {
+      if (grid.parentNode.classList.contains("fitbox")) {   // already in a sized box (content view)
+        layoutGrid(grid, grid.parentNode);
+        return;
+      }
       var box = el("div", "fitbox");
       grid.parentNode.insertBefore(box, grid);
       box.appendChild(grid);
@@ -841,6 +869,108 @@
       if (window.ResizeObserver) new ResizeObserver(run).observe(box);
       else window.addEventListener("resize", run);
     });
+  }
+
+  // ---- view=content: every post from the last 30 days, sortable and filterable ----
+  var CONTENT_SORTS = [["views", "Views"], ["likes", "Likes"], ["comments", "Comments"], ["engagement", "Engagement"], ["newest", "Newest"]];
+  var CONTENT_TYPES = [["all", "All"], ["reel", "Reels"], ["post", "Photos & carousels"]];
+  function pickOption(list, value, def) {
+    return list.some(function (o) { return o[0] === value; }) ? value : def;
+  }
+  function contentCard(acct) {
+    var items = acct.content || [];
+    var state = { sort: pickOption(CONTENT_SORTS, params.get("sort"), "views"),
+                  type: pickOption(CONTENT_TYPES, params.get("type"), "all") };
+    var card = el("article", "card content");
+    card.setAttribute("aria-label", "Last 30 days of posts from " + acct.handle);
+
+    var head = el("div", "reels-head");
+    head.appendChild(avatar(acct));
+    var who = el("div", "who");
+    who.appendChild(el("div", "reels-title", "Last 30 days"));
+    who.appendChild(el("div", "reels-sub", "@" + acct.handle + " · " + items.length + " post" + (items.length === 1 ? "" : "s")));
+    head.appendChild(who);
+    card.appendChild(head);
+
+    if (!acct.content) {
+      card.appendChild(el("div", "pending", "Posts appear here after the next daily update."));
+      return card;
+    }
+
+    var sum = function (k) { return items.reduce(function (t, r) { return t + (r[k] || 0); }, 0); };
+    var reelViews = items.filter(function (r) { return r.views != null; });
+    var stats = el("div", "reels-stats four");
+    [[String(items.length), "posts"],
+     [reelViews.length ? compact(sum("views")) : "—", "reel views"],
+     [compact(sum("likes")), "likes"],
+     [compact(sum("comments")), "comments"]].forEach(function (pair) {
+      var b = el("div");
+      b.appendChild(el("div", "num", pair[0]));
+      b.appendChild(el("div", "cap", pair[1]));
+      stats.appendChild(b);
+    });
+    card.appendChild(stats);
+
+    var controls = el("div", "content-controls");
+    function segment(label, list, key) {
+      var seg = el("div", "seg");
+      seg.setAttribute("role", "group");
+      seg.setAttribute("aria-label", label);
+      seg.appendChild(el("span", "seg-label", label));
+      list.forEach(function (o) {
+        var b = el("button", "chip", o[1]);
+        b.type = "button";
+        b.setAttribute("aria-pressed", String(state[key] === o[0]));
+        b.addEventListener("click", function () {
+          state[key] = o[0];
+          Array.prototype.forEach.call(seg.querySelectorAll(".chip"), function (c) { c.setAttribute("aria-pressed", "false"); });
+          b.setAttribute("aria-pressed", "true");
+          draw();
+        });
+        seg.appendChild(b);
+      });
+      return seg;
+    }
+    controls.appendChild(segment("Sort by", CONTENT_SORTS, "sort"));
+    controls.appendChild(segment("Show", CONTENT_TYPES, "type"));
+    card.appendChild(controls);
+
+    var wrap = el("div", "content-grid-wrap");
+    card.appendChild(wrap);
+    if (fitMode) {
+      wrap.classList.add("fitbox");
+      if (window.ResizeObserver) new ResizeObserver(function () {
+        if (wrap.firstChild && wrap.firstChild.classList.contains("reel-grid")) layoutGrid(wrap.firstChild, wrap);
+      }).observe(wrap);
+    }
+    var limit = Number(params.get("count")) || 0;
+    var score = {
+      views: function (r) { return r.views != null ? r.views : -1; },
+      likes: function (r) { return r.likes || 0; },
+      comments: function (r) { return r.comments || 0; },
+      engagement: function (r) { return (r.likes || 0) + (r.comments || 0); },
+      newest: function (r) { return postedTime(r.posted); }
+    };
+    function draw() {
+      var list = items.filter(function (r) {
+        return state.type === "all" || (state.type === "reel" ? r.type === "reel" : r.type !== "reel");
+      });
+      list.sort(function (a, b) {
+        return (score[state.sort](b) - score[state.sort](a)) || (score.likes(b) - score.likes(a));
+      });
+      if (limit > 0) list = list.slice(0, limit);
+      wrap.innerHTML = "";
+      if (!list.length) {
+        wrap.appendChild(el("div", "pending", state.type === "reel" ? "No reels in the last 30 days."
+          : state.type === "post" ? "No photos or carousels in the last 30 days." : "No posts in the last 30 days."));
+        return;
+      }
+      var g = reelGrid(list, null, params.get("details") !== "0", { rank: state.sort !== "newest" });
+      wrap.appendChild(g);
+      if (fitMode && document.documentElement.classList.contains("fit")) layoutGrid(g, wrap);
+    }
+    draw();
+    return card;
   }
 
   function render(data) {
@@ -872,9 +1002,10 @@
       if (logoMode) addLogos();
       return;
     }
-    if (view === "overview" || view === "spotlight" || view === "reelgrid") {
+    if (view === "overview" || view === "spotlight" || view === "reelgrid" || view === "content") {
       accounts.forEach(function (acct) {
-        grid.appendChild(view === "overview" ? overviewCard(acct) : view === "spotlight" ? spotlightCard(acct) : reelGridCard(acct));
+        grid.appendChild(view === "overview" ? overviewCard(acct) : view === "spotlight" ? spotlightCard(acct)
+          : view === "content" ? contentCard(acct) : reelGridCard(acct));
       });
       mount.innerHTML = "";
       mount.appendChild(grid);

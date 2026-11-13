@@ -52,6 +52,14 @@ All views accept `theme` and `bg=none`.
 
 **`fit=1`** (reels, reelgrid, overview with reels): the card fills the embed and the reel tiles resize so everything fits without scrolling. It picks the column count that gives the biggest tiles, and hides captions, then dates/likes, when tiles get small. Works with one account per embed.
 
+**`view=content`**: every post from the last 30 days (reels, photos and carousels) with totals and sort buttons: Views, Likes, Comments, Engagement (likes + comments), Newest; and a filter: All, Reels, Photos & carousels. Link options set the starting choice: `sort=views|likes|comments|engagement|newest`, `type=all|reel|post`, `count=N` to show only the top N. Works with `fit=1`, `logo=1` and `details=0`. Photos and carousels have no view count, so they show likes.
+
+## Monthly reports
+
+On the first nightly runs of each month, the job writes a **Final** report page for the previous month to the Notion "Monthly Reports" database (one per client): followers at the start and end of the month, growth, posts, reel views, likes, comments, engagement, top 3 posts, a table of every post, and a comparison with the previous month once there is one. Data comes from the follower history and the last 60 posts.
+
+To see a month-to-date **Preview** (or rebuild any month): Actions → Daily Instagram snapshot → Run workflow → enter the month, e.g. `2026-11`. A newer report for the same month replaces (archives) the older one.
+
 **`logo=1`** (every view): the full-color Instagram logo in the top-right corner of each card, from `docs/assets/instagram-logo.svg` (used unaltered). If the file can't load it shows a small "Instagram" label instead.
 
 **`layout=row`** (reels, reelgrid, overview with reels): all reels in one row. Shows 3 reels unless `count=` (or `reels=` on the overview) says otherwise. Combine with `fit=1` to size the row to the embed.
