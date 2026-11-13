@@ -6,10 +6,10 @@ Shared instructions for any coding agent (Claude Code, Codex, or others) working
 Instagram follower and reel tracker for Maximize Media clients.
 - `tracker.py` runs nightly on GitHub Actions (`.github/workflows/daily.yml`). It looks up every Active
   account in the Notion "IG Accounts" database through Instagram Business Discovery, logs snapshots to
-  Notion, keeps a Notion "Reel Report" current, and writes `docs/data.json`.
+  Notion, keeps the Notion "All Posts" database current, and writes `docs/data.json`.
 - `docs/index.html` is the widget page served by GitHub Pages and embedded in Notion pages. It reads
   `docs/data.json`. Link options select the view (see README.md).
-- `data/history.json` (followers per day) and `data/media.json` (reels per day) are the stored history.
+- `data/history.json` (followers per day) and `data/media.json` (posts per day) are the stored history.
   They are written by the nightly job — never edit them by hand.
 
 ## docs/data.json shape

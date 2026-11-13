@@ -5,7 +5,7 @@ For every Active row in the Notion "IG Accounts" database this script:
   1. looks the account up through Instagram Business Discovery,
   2. logs today's numbers in the Notion "IG Snapshots" database (one row per account per day),
   3. updates the account row (Followers, 7-Day Change, 30-Day Change, ...),
-  4. tracks each recent reel's views, likes and comments (Notion "Reel Report" + data/media.json),
+  4. tracks every recent post's views, likes and comments (Notion "All Posts" + data/media.json),
   5. writes docs/data.json, which the widgets read (incl. every post from the last 30 days),
   6. on the first days of each month, writes a Monthly Report page per client in Notion.
 
@@ -261,18 +261,20 @@ def content_items(media, now):
 
 
 def update_reels(store, handle, account_page_id, media, now):
-    """Record today's numbers for each recent reel and keep the Notion Reel Report current."""
+    """Record today's numbers for every recent post and keep the Notion "All Posts" database current.
+    Posts younger than REEL_TRACK_DAYS are updated daily; older posts in the latest pull are added once."""
     day = now.date().isoformat()
     reels = store.setdefault(handle, {})
     for m in media:
-        if not is_reel(m) or "timestamp" not in m:
+        if "timestamp" not in m:
             continue
         e = reels.setdefault(m["id"], {"series": {}})
         e.update({
             "timestamp": m["timestamp"],
+            "type": post_type(m),
             "permalink": m.get("permalink", ""),
             "caption": (m.get("caption") or "")[:500],
-            "thumb": m.get("thumbnail_url") or m.get("media_url") or "",
+            "thumb": m.get("thumbnail_url") or ("" if m.get("media_type") == "VIDEO" else m.get("media_url")) or "",
         })
         e["series"][day] = {"v": m.get("view_count"), "l": m.get("like_count"),
                             "c": m.get("comments_count"), "at": now.isoformat(timespec="minutes")}
@@ -281,15 +283,20 @@ def update_reels(store, handle, account_page_id, media, now):
         return
     track_from = now - timedelta(days=REEL_TRACK_DAYS)
     for media_id, e in reels.items():
-        if parse_ts(e["timestamp"]) < track_from or day not in e["series"]:
-            continue
+        if day not in e["series"]:
+            continue  # not in today's pull
+        if parse_ts(e["timestamp"]) < track_from and e.get("notion"):
+            continue  # older posts are added once, then left alone
         snap = e["series"][day]
-        values = {"views": snap["v"], "likes": snap["l"], "comments": snap["c"],
+        kind = e.get("type", "reel")
+        values = {"type": kind, "views": snap["v"], "likes": snap["l"], "comments": snap["c"],
                   "v24": checkpoint(e, "v24"), "v7": checkpoint(e, "v7"), "v30": checkpoint(e, "v30")}
         if e.get("pushed") == values and e.get("notion"):
             continue  # nothing changed since the last update
         props = {
-            "Reel": {"title": [{"text": {"content": reel_title(e)}}]},
+            "Post": {"title": [{"text": {"content": reel_title(e, kind.capitalize())}}]},
+            "Type": {"select": {"name": kind.capitalize()}},
+            "Handle": rich(handle),
             "Account": {"relation": [{"id": account_page_id}]},
             "Posted": {"date": {"start": parse_ts(e["timestamp"]).astimezone(TZ).isoformat(timespec="minutes")}},
             "Link": {"url": e["permalink"] or None},
@@ -324,7 +331,8 @@ def reel_month_stats(media, now):
 
 def widget_reels(store, handle, today):
     out = []
-    reels = sorted(store.get(handle, {}).items(), key=lambda kv: kv[1]["timestamp"], reverse=True)
+    reels = sorted(((k, v) for k, v in store.get(handle, {}).items() if v.get("type", "reel") == "reel"),
+                   key=lambda kv: kv[1]["timestamp"], reverse=True)
     for media_id, e in reels[:WIDGET_REELS]:
         days = sorted(e["series"])
         last = e["series"][days[-1]]
