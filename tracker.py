@@ -6,7 +6,8 @@ For every Active row in the Notion "IG Accounts" database this script:
   2. logs today's numbers in the Notion "IG Snapshots" database (one row per account per day),
   3. updates the account row (Followers, 7-Day Change, 30-Day Change, ...),
   4. tracks each recent reel's views, likes and comments (Notion "Reel Report" + data/media.json),
-  5. writes docs/data.json, which the widgets read.
+  5. writes docs/data.json, which the widgets read (incl. every post from the last 30 days),
+  6. on the first days of each month, writes a Monthly Report page per client in Notion.
 
 Uses only the Python standard library. Configuration comes from environment variables
 (see .github/workflows/daily.yml).
@@ -19,7 +20,7 @@ import time
 import urllib.error
 import urllib.parse
 import urllib.request
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
@@ -33,6 +34,11 @@ NOTION_TOKEN = os.environ["NOTION_TOKEN"]
 ACCOUNTS_DB = os.environ["NOTION_ACCOUNTS_DB"]
 SNAPSHOTS_DB = os.environ["NOTION_SNAPSHOTS_DB"]
 REELS_DB = os.environ.get("NOTION_REELS_DB", "")
+REPORTS_DB = os.environ.get("NOTION_REPORTS_DB", "")
+# "2026-11" builds (or rebuilds) that month's report on this run. A month that isn't over yet
+# becomes a Preview; a finished month becomes Final.
+REPORT_MONTH = os.environ.get("REPORT_MONTH", "").strip()
+WIDGET_BASE = "https://ajimothymp4.github.io/follower-tracker/"
 
 ROOT = Path(__file__).resolve().parent
 HISTORY_FILE = ROOT / "data" / "history.json"
@@ -40,11 +46,14 @@ WIDGET_FILE = ROOT / "docs" / "data.json"
 KEEP_DAYS = 800          # history kept in the repo
 WIDGET_HISTORY_DAYS = 90  # history sent to the widget
 MEDIA_FILE = ROOT / "data" / "media.json"
-MEDIA_LIMIT = 40          # recent posts pulled per account each run
+MEDIA_LIMIT = 60          # recent posts pulled per account each run
 REEL_TRACK_DAYS = 45      # reels younger than this are updated in Notion daily
 REEL_KEEP_DAYS = 400      # reel history kept in the repo
 WIDGET_REELS = 12         # reels sent to the widget per account
 ENGAGEMENT_POSTS = 12     # posts used for the engagement rate
+CONTENT_DAYS = 30         # posts sent to the widget's content view
+REPORTS_FILE = ROOT / "data" / "reports.json"
+REPORT_DAYS = 5           # the previous month's Final report is built on the first runs of the month
 
 
 # ---------------------------------------------------------------- HTTP helpers
@@ -222,10 +231,33 @@ def checkpoint(entry, key):
     return None
 
 
-def reel_title(entry):
+def reel_title(entry, kind="Reel"):
     first = (entry.get("caption") or "").strip().split("\n")[0].strip()
     when = parse_ts(entry["timestamp"]).astimezone(TZ).strftime("%b %-d")
-    return (first[:90] + ("…" if len(first) > 90 else "")) if first else f"Reel · {when}"
+    return (first[:90] + ("…" if len(first) > 90 else "")) if first else f"{kind} · {when}"
+
+
+def post_type(m):
+    if m.get("media_product_type") == "REELS":
+        return "reel"
+    return {"CAROUSEL_ALBUM": "carousel", "IMAGE": "photo", "VIDEO": "video"}.get(m.get("media_type"), "post")
+
+
+def content_items(media, now):
+    """Every post (reels, photos, carousels) from the last CONTENT_DAYS days, for view=content."""
+    since = now - timedelta(days=CONTENT_DAYS)
+    out = []
+    for m in media:
+        if "timestamp" not in m or parse_ts(m["timestamp"]) < since:
+            continue
+        kind = post_type(m)
+        thumb = m.get("thumbnail_url") or ("" if m.get("media_type") == "VIDEO" else m.get("media_url")) or ""
+        out.append({
+            "id": m["id"], "posted": m["timestamp"], "link": m.get("permalink", ""), "thumb": thumb,
+            "type": kind, "title": reel_title(m, kind.capitalize()),
+            "views": m.get("view_count"), "likes": m.get("like_count"), "comments": m.get("comments_count"),
+        })
+    return out
 
 
 def update_reels(store, handle, account_page_id, media, now):
@@ -309,6 +341,196 @@ def widget_reels(store, handle, today):
     return out
 
 
+# ---------------------------------------------------------------- monthly reports
+
+def month_bounds(ym):
+    y, m = map(int, ym.split("-"))
+    start = date(y, m, 1)
+    end = (start + timedelta(days=32)).replace(day=1) - timedelta(days=1)
+    return start, end
+
+
+def rt(text, url=None, bold=False, color=None):
+    item = {"type": "text", "text": {"content": str(text)[:1900]}}
+    if url:
+        item["text"]["link"] = {"url": url}
+    if bold or color:
+        item["annotations"] = {"bold": bold, "color": color or "default"}
+    return item
+
+
+def block(kind, parts, **extra):
+    body = {"rich_text": parts}
+    body.update(extra)
+    return {"object": "block", "type": kind, kind: body}
+
+
+def n(v):
+    return f"{v:,}" if isinstance(v, (int, float)) else "—"
+
+
+def month_summary(series, media, ym):
+    """Numbers for one account and one month, from follower snapshots and this run's recent posts."""
+    start, end = month_bounds(ym)
+    days = sorted(d for d in series if start.isoformat() <= d <= end.isoformat())
+    posts = [m for m in media if "timestamp" in m
+             and start <= parse_ts(m["timestamp"]).astimezone(TZ).date() <= end]
+    if not days and not posts:
+        return None
+    f_start = series[days[0]]["followers"] if days else None
+    f_end = series[days[-1]]["followers"] if days else None
+    growth = (f_end - f_start) if days else None
+    reels = [m for m in posts if post_type(m) == "reel"]
+    views = [m["view_count"] for m in reels if m.get("view_count") is not None]
+    rates = sorted(((m.get("like_count") or 0) + (m.get("comments_count") or 0)) / f_end
+                   for m in posts if m.get("like_count") is not None and f_end)
+    mid = len(rates) // 2
+    engagement = None if not rates else round(rates[mid] if len(rates) % 2 else (rates[mid - 1] + rates[mid]) / 2, 4)
+    ranked = sorted(posts, key=lambda m: (m.get("view_count") or -1, m.get("like_count") or 0), reverse=True)
+    return {
+        "start": start, "end": end, "first_day": days[0] if days else None, "last_day": days[-1] if days else None,
+        "f_start": f_start, "f_end": f_end, "growth": growth,
+        "growth_pct": round(growth / f_start, 4) if growth is not None and f_start else None,
+        "posts": posts, "reels": len(reels),
+        "views": sum(views) if views else None,
+        "avg_views": round(sum(views) / len(views)) if views else None,
+        "likes": sum(m.get("like_count") or 0 for m in posts),
+        "comments": sum(m.get("comments_count") or 0 for m in posts),
+        "engagement": engagement, "top": ranked[:3],
+    }
+
+
+def report_blocks(handle, s, ym, now, final, prev):
+    month_name = s["start"].strftime("%B %Y")
+    lines = []
+    if s["growth"] is not None:
+        sign = "+" if s["growth"] >= 0 else ""
+        pct = f" ({sign}{s['growth_pct'] * 100:.1f}%)" if s["growth_pct"] is not None else ""
+        lines.append(f"Followers: {n(s['f_start'])} → {n(s['f_end'])}, {sign}{n(s['growth'])}{pct}")
+    lines.append(f"Posts: {len(s['posts'])} ({s['reels']} reel{'' if s['reels'] == 1 else 's'})")
+    if s["views"] is not None:
+        lines.append(f"Reel views: {n(s['views'])} total, {n(s['avg_views'])} average per reel")
+    lines.append(f"Likes: {n(s['likes'])} · Comments: {n(s['comments'])}")
+    if s["engagement"] is not None:
+        lines.append(f"Engagement: {s['engagement'] * 100:.1f}% per post (median)")
+    out = [block("callout", [rt("\n".join(lines))], icon={"type": "emoji", "emoji": "📈"}, color="gray_background")]
+
+    if prev:
+        bits = []
+        if prev.get("growth") is not None and s["growth"] is not None:
+            bits.append(f"follower growth {n(s['growth'])} vs {n(prev['growth'])}")
+        if prev.get("avg_views") is not None and s["avg_views"] is not None:
+            bits.append(f"avg views per reel {n(s['avg_views'])} vs {n(prev['avg_views'])}")
+        bits.append(f"posts {len(s['posts'])} vs {prev.get('posts', '—')}")
+        out.append(block("paragraph", [rt("Compared with last month: ", bold=True), rt("; ".join(bits) + ".")]))
+
+    if s["top"]:
+        out.append(block("heading_2", [rt("Top posts")]))
+        for m in s["top"]:
+            when = parse_ts(m["timestamp"]).astimezone(TZ).strftime("%b %-d")
+            stats = (f"{n(m['view_count'])} views · " if m.get("view_count") is not None else "") + \
+                f"{n(m.get('like_count'))} likes · {n(m.get('comments_count'))} comments · {when}"
+            out.append(block("numbered_list_item", [rt(reel_title(m, post_type(m).capitalize()), m.get("permalink")),
+                                                     rt(" — " + stats)]))
+
+    rows = [["Date", "Post", "Type", "Views", "Likes", "Comments"]]
+    for m in sorted(s["posts"], key=lambda m: m["timestamp"], reverse=True)[:99]:
+        rows.append([parse_ts(m["timestamp"]).astimezone(TZ).strftime("%b %-d"),
+                     (reel_title(m, post_type(m).capitalize()), m.get("permalink")),
+                     post_type(m).capitalize(), n(m.get("view_count")), n(m.get("like_count")),
+                     n(m.get("comments_count"))])
+    out.append(block("heading_2", [rt(f"All posts in {month_name} ({len(s['posts'])})")]))
+    if len(rows) > 1:
+        out.append({"object": "block", "type": "table", "table": {
+            "table_width": 6, "has_column_header": True, "has_row_header": False,
+            "children": [{"object": "block", "type": "table_row", "table_row": {"cells": [
+                [rt(c[0], c[1])] if isinstance(c, tuple) else [rt(c)] for c in r]}} for r in rows]}})
+    else:
+        out.append(block("paragraph", [rt("No posts this month.")]))
+
+    notes = [f"Views and likes are as of {now.strftime('%b %-d, %Y')}; posts from late in the month have had "
+             "less time to collect views. Views include paid views and Facebook views on cross-posted reels."]
+    if s["first_day"] and s["first_day"] > s["start"].isoformat():
+        notes.append(f"Follower tracking for this month starts {date.fromisoformat(s['first_day']).strftime('%b %-d')}.")
+    if not final:
+        notes.append(f"Preview: {month_name} isn't over yet. The final report is created automatically "
+                     f"at the start of next month.")
+    out.append(block("paragraph", [rt(" ".join(notes), color="gray")]))
+    out.append(block("paragraph", [rt("Live content widget", f"{WIDGET_BASE}?handle={handle}&view=content")]))
+    return out
+
+
+def write_report(reports, ym, inp, now, final):
+    """Create one account's report page for month ym, replacing an earlier preview of the same month."""
+    s = month_summary(inp["series"], inp["media"], ym)
+    if s is None:
+        return False
+    month_name = s["start"].strftime("%B %Y")
+    title = f"{inp['label']} · {month_name}" + ("" if final else f" (preview through {now.strftime('%b %-d')})")
+    prev_ym = (s["start"] - timedelta(days=1)).strftime("%Y-%m")
+    prev = reports.get(prev_ym, {}).get(inp["handle"])
+    prev = prev if prev and prev.get("status") == "Final" else None
+    top = s["top"][0] if s["top"] else None
+    props = {
+        "Report": {"title": [{"text": {"content": title}}]},
+        "Account": {"relation": [{"id": inp["page_id"]}]},
+        "Month": {"date": {"start": s["start"].isoformat(), "end": s["end"].isoformat()}},
+        "Status": {"select": {"name": "Final" if final else "Preview"}},
+        "Followers Start": {"number": s["f_start"]}, "Followers End": {"number": s["f_end"]},
+        "Follower Growth": {"number": s["growth"]}, "Growth %": {"number": s["growth_pct"]},
+        "Posts": {"number": len(s["posts"])}, "Reels": {"number": s["reels"]},
+        "Total Views": {"number": s["views"]}, "Avg Views per Reel": {"number": s["avg_views"]},
+        "Total Likes": {"number": s["likes"]}, "Total Comments": {"number": s["comments"]},
+        "Engagement": {"number": s["engagement"]},
+        "Top Post": {"url": top.get("permalink") if top else None},
+        "Generated": {"date": {"start": now.isoformat(timespec="minutes")}},
+    }
+    old = reports.get(ym, {}).get(inp["handle"])
+    page = notion("POST", "pages", {"parent": {"database_id": REPORTS_DB}, "properties": props,
+                                    "icon": {"type": "emoji", "emoji": "📊"},
+                                    "children": report_blocks(inp["handle"], s, ym, now, final, prev)})
+    if old and old.get("page"):
+        try:
+            notion("PATCH", f"pages/{old['page']}", {"archived": True})
+        except RuntimeError:
+            pass  # already deleted in Notion
+    reports.setdefault(ym, {})[inp["handle"]] = {
+        "page": page["id"], "status": "Final" if final else "Preview",
+        "growth": s["growth"], "avg_views": s["avg_views"], "posts": len(s["posts"]),
+        "views": s["views"], "f_end": s["f_end"],
+    }
+    return True
+
+
+def run_reports(report_inputs, now, failures):
+    if not REPORTS_DB:
+        return
+    reports = json.loads(REPORTS_FILE.read_text()) if REPORTS_FILE.exists() else {}
+    today = now.date()
+    jobs = []
+    if REPORT_MONTH:
+        _, end = month_bounds(REPORT_MONTH)
+        jobs.append((REPORT_MONTH, end < today, True))
+    if today.day <= REPORT_DAYS:
+        prev_month = (today.replace(day=1) - timedelta(days=1)).strftime("%Y-%m")
+        if prev_month != REPORT_MONTH:
+            jobs.append((prev_month, True, False))
+    for ym, final, forced in jobs:
+        made = 0
+        for inp in report_inputs:
+            existing = reports.get(ym, {}).get(inp["handle"])
+            if not forced and existing and existing.get("status") == "Final":
+                continue
+            try:
+                made += write_report(reports, ym, inp, now, final)
+            except Exception as err:  # noqa: BLE001 - a report problem must not stop the nightly update
+                failures.append(f"{inp['label']}: {ym} report: {err}")
+                print(f"  ! {inp['handle']}: {ym} report failed: {err}")
+        if made:
+            print(f"{ym} reports written: {made} ({'Final' if final else 'Preview'})")
+    REPORTS_FILE.write_text(json.dumps(reports, indent=1, sort_keys=True))
+
+
 # ---------------------------------------------------------------- main
 
 def main():
@@ -318,7 +540,7 @@ def main():
 
     history = json.loads(HISTORY_FILE.read_text()) if HISTORY_FILE.exists() else {}
     media_store = json.loads(MEDIA_FILE.read_text()) if MEDIA_FILE.exists() else {}
-    widget_accounts, failures = [], []
+    widget_accounts, failures, report_inputs = [], [], []
 
     accounts = active_accounts()
     print(f"{len(accounts)} active account(s)")
@@ -395,7 +617,10 @@ def main():
             "avg30": avg30,
             "reels30": reels30,
             "reels": widget_reels(media_store, handle, today),
+            "content": content_items(media, now),
         })
+        report_inputs.append({"handle": ig.get("username", handle), "label": label, "page_id": page_id,
+                              "series": series, "media": media})
         print(f"  ✓ {handle}: {followers:,} followers")
 
     # prune and save
@@ -410,6 +635,8 @@ def main():
         media_store[handle] = {k: v for k, v in media_store[handle].items()
                                if parse_ts(v["timestamp"]) >= reel_cutoff}
     MEDIA_FILE.write_text(json.dumps(media_store, indent=1, sort_keys=True))
+
+    run_reports(report_inputs, now, failures)
 
     WIDGET_FILE.parent.mkdir(parents=True, exist_ok=True)
     WIDGET_FILE.write_text(json.dumps({

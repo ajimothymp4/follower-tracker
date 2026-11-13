@@ -17,6 +17,8 @@ Instagram follower and reel tracker for Maximize Media clients.
 { updated, accounts: [ { handle, label, name, picture, followers, posts, change7, change30,
   changeSinceStart, trackingSince, history: [{date, followers}], engagement,   // fraction, e.g. 0.0125
   avg30, reels30,   // avg views and count of reels posted in the last 30 days
+  content: [ { id, posted, link, thumb, type /* reel|carousel|photo|video */, title, views /* null for photos */,
+               likes, comments } ],   // every post from the last 30 days
   reels: [ { id, posted /* 2026-11-10T18:38:47+0000 */, link, thumb, title, views, likes, comments,
              v24, v7, v30, history: [{date, views}] } ] } ] }
 ```
@@ -25,7 +27,9 @@ Instagram follower and reel tracker for Maximize Media clients.
 handle (comma list), theme=light|dark (default follows device), size=large|small, chart=0, stats=1,
 days=N, view=reels, count=N, feature=first, bg=none, view=overview (reels=N, details=0),
 view=stat&stat=followers|growth7|avgviews|topreel|engagement|posts30, view=spotlight,
-view=reelgrid (count=N, details=0), stat=avg30, fit=1, layout=row, logo=1 (uses docs/assets/instagram-logo.svg as-is; never redraw or recolor it).
+view=reelgrid (count=N, details=0), stat=avg30, fit=1, layout=row, logo=1 (uses docs/assets/instagram-logo.svg as-is; never redraw or recolor it),
+view=content (sort=views|likes|comments|engagement|newest, type=all|reel|post, count=N).
+Monthly reports: tracker.py writes Notion "Monthly Reports" pages; data/reports.json records them.
 
 ## Design
 Reuse the CSS variables (--card, --ink, --muted, --up, --down, …), the Inter font, the 28px card radius,
