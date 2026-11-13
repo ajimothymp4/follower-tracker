@@ -1,0 +1,121 @@
+{
+ "2026-11": {
+  "ajkallasvideo": {
+   "avg_views": null,
+   "f_end": 614,
+   "growth": 1,
+   "page": "417ddace-cecc-81a9-a440-f2c1a02af67e",
+   "posts": 0,
+   "status": "Preview",
+   "views": null
+  },
+  "firsthomeindy": {
+   "avg_views": 2071,
+   "f_end": 114,
+   "growth": 12,
+   "page": "417ddace-cecc-81a5-8d82-f9de978fed92",
+   "posts": 6,
+   "status": "Preview",
+   "views": 8283
+  },
+  "househackindy": {
+   "avg_views": null,
+   "f_end": 81,
+   "growth": 3,
+   "page": "417ddace-cecc-81cd-a154-eb5b827673a6",
+   "posts": 0,
+   "status": "Preview",
+   "views": null
+  },
+  "iandefelice": {
+   "avg_views": 4730,
+   "f_end": 3565,
+   "growth": 48,
+   "page": "417ddace-cecc-8136-b1ed-f0ebb13dac6a",
+   "posts": 7,
+   "status": "Preview",
+   "views": 18921
+  },
+  "indystreetsweep": {
+   "avg_views": null,
+   "f_end": 1007,
+   "growth": -2,
+   "page": "417ddace-cecc-81ec-8aee-e242cb7bb7b7",
+   "posts": 0,
+   "status": "Preview",
+   "views": null
+  },
+  "isaacrossvideo": {
+   "avg_views": 38400,
+   "f_end": 3040,
+   "growth": 248,
+   "page": "417ddace-cecc-81a8-8b42-daee592416c3",
+   "posts": 5,
+   "status": "Preview",
+   "views": 153598
+  },
+  "khoffx": {
+   "avg_views": 11000,
+   "f_end": 1099,
+   "growth": 71,
+   "page": "417ddace-cecc-817c-ba15-c1b02ca6a150",
+   "posts": 3,
+   "status": "Preview",
+   "views": 11000
+  },
+  "lastergrowth": {
+   "avg_views": 397,
+   "f_end": 3525,
+   "growth": -3,
+   "page": "417ddace-cecc-8191-b385-d353fa9fec46",
+   "posts": 8,
+   "status": "Preview",
+   "views": 2779
+  },
+  "maxxmoorre": {
+   "avg_views": null,
+   "f_end": 3225,
+   "growth": -5,
+   "page": "417ddace-cecc-8100-807e-ea54ce545fe9",
+   "posts": 0,
+   "status": "Preview",
+   "views": null
+  },
+  "remingtontramsey": {
+   "avg_views": 35400,
+   "f_end": 88099,
+   "growth": 1118,
+   "page": "417ddace-cecc-8126-8013-e11ddb534411",
+   "posts": 5,
+   "status": "Preview",
+   "views": 177002
+  },
+  "roots.realty.co": {
+   "avg_views": 9985,
+   "f_end": 4819,
+   "growth": 49,
+   "page": "417ddace-cecc-815b-a3f0-dd7e2ec1eee8",
+   "posts": 4,
+   "status": "Preview",
+   "views": 39941
+  },
+  "trace.mp4": {
+   "avg_views": 15181,
+   "f_end": 1967,
+   "growth": 8,
+   "page": "417ddace-cecc-8177-b6d6-c42a6423440c",
+   "posts": 2,
+   "status": "Preview",
+   "views": 30362
+  },
+  "tyler_lingle": {
+   "avg_views": 3504,
+   "f_end": 9729,
+   "growth": 29,
+   "page": "417ddace-cecc-81e5-9e1e-ed7dae325df6",
+   "posts": 4,
+   "status": "Preview",
+   "views": 7009
+  }
+ }
+}
